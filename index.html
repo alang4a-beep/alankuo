@@ -43,27 +43,27 @@
   <script type="importmap">
 {
   "imports": {
-    "vite": "https://aistudiocdn.com/vite@^7.2.4",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
-    "zustand": "https://aistudiocdn.com/zustand@^5.0.8",
     "@react-three/fiber": "https://aistudiocdn.com/@react-three/fiber@^9.4.0",
-    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
-    "@react-three/drei": "https://aistudiocdn.com/@react-three/drei@^10.7.7",
-    "@react-three/postprocessing": "https://aistudiocdn.com/@react-three/postprocessing@^3.0.4",
     "three": "https://aistudiocdn.com/three@^0.181.2",
-    "postprocessing": "https://aistudiocdn.com/postprocessing@^6.38.0"
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "@react-three/postprocessing": "https://aistudiocdn.com/@react-three/postprocessing@^3.0.4",
+    "postprocessing": "https://aistudiocdn.com/postprocessing@^6.38.0",
+    "@react-three/drei": "https://aistudiocdn.com/@react-three/drei@^10.7.7",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
+    "zustand": "https://aistudiocdn.com/zustand@^5.0.8",
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
   }
 }
 </script>
 </head>
   <body>
     <div id="root"></div>
-    <!-- 關鍵修正：指向 src 資料夾內的 index.tsx -->
-    <script type="module" src="/src/index.tsx"></script>
+    <!-- 修正路徑：使用 ./src/index.tsx 以確保相對路徑正確 -->
+    <script type="module" src="./src/index.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
