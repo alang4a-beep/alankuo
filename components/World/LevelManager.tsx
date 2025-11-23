@@ -11,13 +11,19 @@ import * as THREE from 'three';
 import { Text, Center } from '@react-three/drei';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '../../store';
-import { GameObject, ObjectType, LANE_WIDTH, SPAWN_DISTANCE, REMOVE_DISTANCE, GameStatus, NEON_COLORS } from '../../types';
+import { GameObject, ObjectType, LANE_WIDTH, SPAWN_DISTANCE, REMOVE_DISTANCE, GameStatus, NEON_COLORS, Difficulty } from '../../types';
 import { audio } from '../System/Audio';
 
 // Geometry Constants
 const OBSTACLE_HEIGHT = 1.6;
+const OBSTACLE_TALL_HEIGHT = 3.2; // Taller for double jump/fly requirement
+
 const OBSTACLE_GEOMETRY = new THREE.ConeGeometry(0.9, OBSTACLE_HEIGHT, 6);
+const OBSTACLE_TALL_GEOMETRY = new THREE.CylinderGeometry(0.7, 0.9, OBSTACLE_TALL_HEIGHT, 6); // Tall Tower
+
 const OBSTACLE_GLOW_GEO = new THREE.ConeGeometry(0.9, OBSTACLE_HEIGHT, 6);
+const OBSTACLE_TALL_GLOW_GEO = new THREE.CylinderGeometry(0.75, 0.95, OBSTACLE_TALL_HEIGHT, 6);
+
 const OBSTACLE_RING_GEO = new THREE.RingGeometry(0.6, 0.9, 6);
 
 const GEM_GEOMETRY = new THREE.IcosahedronGeometry(0.3, 0);
@@ -49,35 +55,26 @@ const SHOP_FLOOR_GEO = new THREE.PlaneGeometry(1, 4);
 
 const PARTICLE_COUNT = 600;
 const SPAWN_INTERVAL_BASE = 150; 
-// Removed FONT_URL to support offline mode via default Text component
 
 // --- Helper: Generate Chinese Char Texture ---
 const createCharTexture = (char: string, color: string) => {
     const canvas = document.createElement('canvas');
-    // Canvas size sufficient for high res text
     canvas.width = 512; 
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
     if (ctx) {
         ctx.clearRect(0,0, 512, 512);
-        
-        // Text
-        // Use the neon color for the text itself
         ctx.fillStyle = color; 
-        
-        // Increased font size
         ctx.font = 'bold 240px "Microsoft JhengHei", "Noto Sans TC", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(char, 256, 256);
-        
-        // Add White Border for contrast against dark space background
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 12;
         ctx.strokeText(char, 256, 256);
     }
     const tex = new THREE.CanvasTexture(canvas);
-    tex.colorSpace = THREE.SRGBColorSpace; // Correct color space
+    tex.colorSpace = THREE.SRGBColorSpace; 
     tex.minFilter = THREE.LinearMipMapLinearFilter;
     tex.magFilter = THREE.LinearFilter;
     tex.generateMipmaps = true;
@@ -197,7 +194,8 @@ export const LevelManager: React.FC = () => {
     level,
     isManualSlowMotion,
     addScore,
-    registerIgnore
+    registerIgnore,
+    difficulty
   } = useStore();
   
   const objectsRef = useRef<GameObject[]>([]);
@@ -223,14 +221,12 @@ export const LevelManager: React.FC = () => {
         nextSpawnDistance.current = SPAWN_INTERVAL_BASE;
 
     } else if (isLevelUp && level > 1) {
-        // Find furthest object Z to place portal behind
         let furthestZ = -50;
         const staticObjects = objectsRef.current.filter(o => o.type !== ObjectType.MISSILE && o.type !== ObjectType.PROJECTILE);
         if (staticObjects.length > 0) {
              furthestZ = Math.min(...staticObjects.map(o => o.position[2]));
         }
 
-        // Spawn Shop Portal behind existing objects
         const portalZ = Math.min(furthestZ - 30, -100);
 
         objectsRef.current.push({
@@ -240,9 +236,7 @@ export const LevelManager: React.FC = () => {
             active: true,
         });
         
-        // Push next question to appear after the shop
         nextSpawnDistance.current = distanceTraveled.current + 80;
-        
         setRenderTrigger(t => t + 1);
         
     } else if (status === GameStatus.GAME_OVER || status === GameStatus.VICTORY) {
@@ -253,7 +247,6 @@ export const LevelManager: React.FC = () => {
     prevLevel.current = level;
   }, [status, level, setDistance]);
 
-  // Handle Player Shooting Event
   useEffect(() => {
     const handleShoot = (e: CustomEvent) => {
         const { position } = e.detail;
@@ -261,11 +254,10 @@ export const LevelManager: React.FC = () => {
             objectsRef.current.push({
                 id: uuidv4(),
                 type: ObjectType.PROJECTILE,
-                position: [position.x, position.y + 0.5, position.z - 1.5], // Start slightly in front
+                position: [position.x, position.y + 0.5, position.z - 1.5],
                 active: true,
                 color: '#ff5500'
             });
-            // Force re-render to show projectile immediately
             setRenderTrigger(t => t + 1);
         }
     };
@@ -287,9 +279,6 @@ export const LevelManager: React.FC = () => {
     if (status !== GameStatus.PLAYING) return;
     
     const safeDelta = Math.min(delta, 0.05); 
-    
-    // Apply speed modifiers:
-    // Manual Slow Motion (Spacebar): 30% (0.3x)
     let modifier = 1.0;
     if (isManualSlowMotion) modifier *= 0.3;
 
@@ -309,19 +298,17 @@ export const LevelManager: React.FC = () => {
     const keptObjects: GameObject[] = [];
     const newSpawns: GameObject[] = [];
 
-    // Separate objects into categories for collision checks
     const enemies = currentObjects.filter(o => (o.type === ObjectType.OBSTACLE || o.type === ObjectType.ALIEN) && o.active);
     
     for (const obj of currentObjects) {
         let moveAmount = dist;
         const MISSILE_SPEED = 30;
-        const PROJECTILE_SPEED = 40; // Fireball speed
+        const PROJECTILE_SPEED = 40; 
         
         if (obj.type === ObjectType.MISSILE) {
             moveAmount += MISSILE_SPEED * safeDelta * modifier; 
         } else if (obj.type === ObjectType.PROJECTILE) {
-            moveAmount = 0; // Projectiles move independently
-            // To make projectile go away from player, we need to subtract Z.
+            moveAmount = 0;
             obj.position[2] -= PROJECTILE_SPEED * safeDelta;
         }
 
@@ -331,9 +318,7 @@ export const LevelManager: React.FC = () => {
             obj.position[2] += moveAmount;
         }
         
-        // Projectile Logic
         if (obj.type === ObjectType.PROJECTILE && obj.active) {
-            // Check collision with enemies
             for (const enemy of enemies) {
                 if (!enemy.active) continue;
                 
@@ -341,30 +326,24 @@ export const LevelManager: React.FC = () => {
                 const dz = Math.abs(obj.position[2] - enemy.position[2]);
                 
                 if (dx < 1.0 && dz < 1.5) {
-                    // HIT!
                     obj.active = false;
                     enemy.active = false;
                     hasChanges = true;
-                    
-                    // REWARD FOR DESTROYING OBSTACLE
                     addScore(500);
 
                     window.dispatchEvent(new CustomEvent('particle-burst', { 
                         detail: { position: enemy.position, color: '#ffaa00' } 
                     }));
-                    audio.playDamage(); // Explosion sound
+                    audio.playDamage(); 
                     break;
                 }
             }
-            
-            // Remove if too far
             if (obj.position[2] < -150) {
                 obj.active = false;
                 hasChanges = true;
             }
         }
         
-        // Alien AI Logic
         if (obj.type === ObjectType.ALIEN && obj.active && !obj.hasFired) {
              if (obj.position[2] > -90) {
                  obj.hasFired = true;
@@ -400,12 +379,9 @@ export const LevelManager: React.FC = () => {
                 if (dx < 0.9) { 
                      
                      const isDamageSource = obj.type === ObjectType.OBSTACLE || obj.type === ObjectType.ALIEN || obj.type === ObjectType.MISSILE;
-                     
-                     // NOTE: Wrong character answers also act as damage sources in this logic
                      const isCharacter = obj.type === ObjectType.LETTER;
                      
                      if (isDamageSource) {
-                         // Vertical check for obstacles
                          const playerBottom = playerPos.y;
                          const playerTop = playerPos.y + 1.8;
                          let objBottom = obj.position[1] - 0.5;
@@ -413,7 +389,11 @@ export const LevelManager: React.FC = () => {
 
                          if (obj.type === ObjectType.OBSTACLE) {
                              objBottom = 0;
-                             objTop = OBSTACLE_HEIGHT;
+                             if (obj.variant === 'tall') {
+                                 objTop = OBSTACLE_TALL_HEIGHT;
+                             } else {
+                                 objTop = OBSTACLE_HEIGHT;
+                             }
                          } else if (obj.type === ObjectType.MISSILE) {
                              objBottom = 0.5;
                              objTop = 1.5;
@@ -430,8 +410,7 @@ export const LevelManager: React.FC = () => {
                                 }));
                              }
                          }
-                     } else if (obj.type !== ObjectType.PROJECTILE) { // Skip projectile self-collision check
-                         // Item Collection (Gem or Letter)
+                     } else if (obj.type !== ObjectType.PROJECTILE) { 
                          const dy = Math.abs(obj.position[1] - playerPos.y);
                          if (dy < 2.5) { 
                             if (obj.type === ObjectType.GEM) {
@@ -442,23 +421,19 @@ export const LevelManager: React.FC = () => {
                                 }));
                             }
                             if (obj.type === ObjectType.LETTER && obj.value) {
-                                // IMPORTANT: Use submitAnswer result to determine VFX/SFX
                                 const isCorrect = submitAnswer(obj.value);
-                                
                                 if (isCorrect) {
                                     audio.playLetterCollect(); 
                                     window.dispatchEvent(new CustomEvent('particle-burst', { 
                                         detail: { position: obj.position, color: '#00ff00' } 
                                     }));
                                 } else {
-                                    // WRONG ANSWER
                                     audio.playDamage(); 
                                     window.dispatchEvent(new CustomEvent('particle-burst', { 
                                         detail: { position: obj.position, color: '#ff0000' } 
                                     }));
                                 }
                             }
-
                             obj.active = false;
                             hasChanges = true;
                          }
@@ -468,11 +443,9 @@ export const LevelManager: React.FC = () => {
         }
 
         if (obj.position[2] > REMOVE_DISTANCE && obj.type !== ObjectType.PROJECTILE) {
-            // Logic for detecting ignored/missed answers
             if (obj.type === ObjectType.LETTER && obj.isTarget && obj.active) {
                 registerIgnore();
             }
-
             keep = false;
             hasChanges = true;
         }
@@ -493,7 +466,6 @@ export const LevelManager: React.FC = () => {
         furthestZ = Math.min(...staticObjects.map(o => o.position[2]));
     }
 
-    // Always ensure spawn buffer
     if (furthestZ > -SPAWN_DISTANCE) {
          const minGap = Math.min(12 + (speed * 0.4), 45); 
          
@@ -501,11 +473,9 @@ export const LevelManager: React.FC = () => {
          
          const isQuestionDue = distanceTraveled.current >= nextSpawnDistance.current;
 
-         // Logic: Single choice spawning flow
          if (isQuestionDue && currentVocab) {
+             // ... [Question spawning logic remains same]
              const lane = getRandomLane(laneCount);
-             
-             // 40% chance it is the correct answer, 60% chance distractor
              const isTarget = Math.random() < 0.4;
              const val = isTarget ? currentVocab.char : getRandomDistractor();
              
@@ -518,13 +488,11 @@ export const LevelManager: React.FC = () => {
                 value: val,
                 isTarget: isTarget
              });
-
-             // Space out the next letter significantly
              nextSpawnDistance.current = distanceTraveled.current + 40; 
              hasChanges = true;
 
          } else if (Math.random() > 0.1) { 
-            // Standard Obstacle Spawning
+            // OBSTACLE SPAWNING
             const isObstacle = Math.random() > 0.20;
 
             if (isObstacle) {
@@ -541,46 +509,72 @@ export const LevelManager: React.FC = () => {
                         hasFired: false
                     });
                 } else {
-                    // Spikes
+                    // --- COMPLEX DIFFICULTY LOGIC ---
                     const availableLanes = [];
                     const maxLane = Math.floor(laneCount / 2);
                     for (let i = -maxLane; i <= maxLane; i++) availableLanes.push(i);
                     availableLanes.sort(() => Math.random() - 0.5);
-                    
-                    // --- DYNAMIC DENSITY SCALING ---
-                    // 3 lanes -> ~1-2 obstacles
-                    // 9 lanes -> ~4-5 obstacles
-                    const spawnCountBase = Math.floor(laneCount / 2); 
-                    const variation = Math.random() > 0.5 ? 1 : 0;
-                    let countToSpawn = Math.max(1, spawnCountBase + variation);
-                    
-                    if (countToSpawn >= availableLanes.length) countToSpawn = availableLanes.length - 1;
 
-                    for (let i = 0; i < countToSpawn; i++) {
-                        const lane = availableLanes[i];
+                    // Wall / Tower Logic for Complex Difficulty
+                    const spawnWall = difficulty === Difficulty.COMPLEX && Math.random() < 0.15; // 15% chance for wall
+                    const spawnTower = difficulty === Difficulty.COMPLEX && Math.random() < 0.15; // 15% chance for tall tower
+
+                    if (spawnWall) {
+                        // Spawn Standard Obstacles in ALL lanes (Wall)
+                        for (let i = -maxLane; i <= maxLane; i++) {
+                            keptObjects.push({
+                                id: uuidv4(),
+                                type: ObjectType.OBSTACLE,
+                                position: [i * LANE_WIDTH, OBSTACLE_HEIGHT / 2, spawnZ],
+                                active: true,
+                                color: '#ff0000', // Redder for walls
+                                variant: 'normal'
+                            });
+                        }
+                    } else if (spawnTower) {
+                        // Spawn Tall Obstacle (Requires Double Jump/Fly)
+                        const lane = availableLanes[0];
                         keptObjects.push({
                             id: uuidv4(),
                             type: ObjectType.OBSTACLE,
-                            position: [lane * LANE_WIDTH, OBSTACLE_HEIGHT / 2, spawnZ],
+                            position: [lane * LANE_WIDTH, OBSTACLE_TALL_HEIGHT / 2, spawnZ],
                             active: true,
-                            color: '#ff0054'
+                            color: '#9900ff', // Purple for tall
+                            variant: 'tall'
                         });
+                    } else {
+                        // Standard Random Spikes
+                        const spawnCountBase = Math.floor(laneCount / 2); 
+                        const variation = Math.random() > 0.5 ? 1 : 0;
+                        let countToSpawn = Math.max(1, spawnCountBase + variation);
+                        if (countToSpawn >= availableLanes.length) countToSpawn = availableLanes.length - 1;
 
-                        if (Math.random() < 0.3) {
-                             keptObjects.push({
+                        for (let i = 0; i < countToSpawn; i++) {
+                            const lane = availableLanes[i];
+                            keptObjects.push({
                                 id: uuidv4(),
-                                type: ObjectType.GEM,
-                                position: [lane * LANE_WIDTH, OBSTACLE_HEIGHT + 1.0, spawnZ],
+                                type: ObjectType.OBSTACLE,
+                                position: [lane * LANE_WIDTH, OBSTACLE_HEIGHT / 2, spawnZ],
                                 active: true,
-                                color: '#ffd700',
-                                points: 100
+                                color: '#ff0054',
+                                variant: 'normal'
                             });
+
+                            if (Math.random() < 0.3) {
+                                keptObjects.push({
+                                    id: uuidv4(),
+                                    type: ObjectType.GEM,
+                                    position: [lane * LANE_WIDTH, OBSTACLE_HEIGHT + 1.0, spawnZ],
+                                    active: true,
+                                    color: '#ffd700',
+                                    points: 100
+                                });
+                            }
                         }
                     }
                 }
 
             } else {
-                // Ground Gem
                 const lane = getRandomLane(laneCount);
                 keptObjects.push({
                     id: uuidv4(),
@@ -612,27 +606,17 @@ export const LevelManager: React.FC = () => {
   );
 };
 
-// Separate Component for the Floating Character to handle Texture Memoization
+// ... [CharSprite component stays the same] ...
 const CharSprite: React.FC<{ value: string, color: string }> = ({ value, color }) => {
     const texture = useMemo(() => createCharTexture(value, color), [value, color]);
-    
-    // Dispose texture on unmount to prevent memory leaks (broken graphics)
     useEffect(() => {
-        return () => {
-            texture.dispose();
-        };
+        return () => { texture.dispose(); };
     }, [texture]);
     
     return (
         <mesh>
             <planeGeometry args={[3.0, 3.0]} />
-            <meshBasicMaterial 
-                map={texture} 
-                transparent={true} 
-                side={THREE.DoubleSide} 
-                alphaTest={0.5} 
-                depthWrite={true} 
-            />
+            <meshBasicMaterial map={texture} transparent={true} side={THREE.DoubleSide} alphaTest={0.5} depthWrite={true} />
         </mesh>
     );
 }
@@ -650,7 +634,6 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
 
         if (visualRef.current) {
             const baseHeight = data.position[1];
-            
             if (data.type === ObjectType.SHOP_PORTAL) {
                  visualRef.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * 2) * 0.02);
             } else if (data.type === ObjectType.MISSILE) {
@@ -664,7 +647,6 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
                  visualRef.current.position.y = baseHeight + Math.sin(state.clock.elapsedTime * 3) * 0.2;
                  visualRef.current.rotation.y += delta;
             } else if (data.type === ObjectType.LETTER) {
-                // Fixed position and orientation
                 visualRef.current.rotation.set(-0.2, 0, 0); 
                 const bobOffset = Math.sin(state.clock.elapsedTime * 4 + data.position[0]) * 0.1;
                 visualRef.current.position.y = baseHeight + bobOffset;
@@ -714,17 +696,7 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
                              <meshBasicMaterial color="#00ffff" wireframe transparent opacity={0.3} />
                          </mesh>
                          <Center position={[0, 5, 0.6]}>
-                             {/* Replaced Text3D with Drei Text for Offline Capability */}
-                             <Text
-                                fontSize={1.2}
-                                color="#ffff00"
-                                anchorX="center"
-                                anchorY="middle"
-                                outlineWidth={0.05}
-                                outlineColor="#ff0000"
-                             >
-                                 CYBER SHOP
-                             </Text>
+                             <Text fontSize={1.2} color="#ffff00" anchorX="center" anchorY="middle" outlineWidth={0.05} outlineColor="#ff0000">CYBER SHOP</Text>
                          </Center>
                          <mesh position={[0, 0.1, 0]} rotation={[-Math.PI/2, 0, 0]} geometry={SHOP_FLOOR_GEO} scale={[laneCount * LANE_WIDTH, 1, 1]}>
                              <meshBasicMaterial color="#00ffff" transparent opacity={0.3} />
@@ -735,15 +707,30 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
                 {/* OBSTACLE */}
                 {data.type === ObjectType.OBSTACLE && (
                     <group>
-                        <mesh geometry={OBSTACLE_GEOMETRY} castShadow receiveShadow>
-                             <meshStandardMaterial color="#330011" roughness={0.3} metalness={0.8} flatShading={true} />
-                        </mesh>
-                        <mesh scale={[1.02, 1.02, 1.02]} geometry={OBSTACLE_GLOW_GEO}>
-                             <meshBasicMaterial color={data.color} wireframe transparent opacity={0.3} />
-                        </mesh>
-                         <mesh position={[0, -OBSTACLE_HEIGHT/2 + 0.05, 0]} rotation={[-Math.PI/2,0,0]} geometry={OBSTACLE_RING_GEO}>
-                             <meshBasicMaterial color={data.color} transparent opacity={0.4} side={THREE.DoubleSide} />
-                         </mesh>
+                        {data.variant === 'tall' ? (
+                             // Tall Tower
+                             <>
+                                 <mesh geometry={OBSTACLE_TALL_GEOMETRY} castShadow receiveShadow>
+                                     <meshStandardMaterial color="#2a0033" roughness={0.3} metalness={0.9} />
+                                 </mesh>
+                                 <mesh scale={[1.02, 1.02, 1.02]} geometry={OBSTACLE_TALL_GLOW_GEO}>
+                                     <meshBasicMaterial color={data.color} wireframe transparent opacity={0.5} />
+                                 </mesh>
+                             </>
+                        ) : (
+                             // Standard Cone
+                             <>
+                                 <mesh geometry={OBSTACLE_GEOMETRY} castShadow receiveShadow>
+                                     <meshStandardMaterial color="#330011" roughness={0.3} metalness={0.8} flatShading={true} />
+                                 </mesh>
+                                 <mesh scale={[1.02, 1.02, 1.02]} geometry={OBSTACLE_GLOW_GEO}>
+                                     <meshBasicMaterial color={data.color} wireframe transparent opacity={0.3} />
+                                 </mesh>
+                                 <mesh position={[0, -OBSTACLE_HEIGHT/2 + 0.05, 0]} rotation={[-Math.PI/2,0,0]} geometry={OBSTACLE_RING_GEO}>
+                                     <meshBasicMaterial color={data.color} transparent opacity={0.4} side={THREE.DoubleSide} />
+                                 </mesh>
+                             </>
+                        )}
                     </group>
                 )}
 
@@ -756,51 +743,29 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
                         <mesh position={[0, 0.2, 0]} geometry={ALIEN_DOME_GEO}>
                             <meshStandardMaterial color="#00ff00" emissive="#00ff00" emissiveIntensity={0.5} transparent opacity={0.8} />
                         </mesh>
-                        <mesh position={[0.3, 0, 0.3]} geometry={ALIEN_EYE_GEO}>
-                             <meshBasicMaterial color="#ff00ff" />
-                        </mesh>
-                        <mesh position={[-0.3, 0, 0.3]} geometry={ALIEN_EYE_GEO}>
-                             <meshBasicMaterial color="#ff00ff" />
-                        </mesh>
+                        <mesh position={[0.3, 0, 0.3]} geometry={ALIEN_EYE_GEO}><meshBasicMaterial color="#ff00ff" /></mesh>
+                        <mesh position={[-0.3, 0, 0.3]} geometry={ALIEN_EYE_GEO}><meshBasicMaterial color="#ff00ff" /></mesh>
                     </group>
                 )}
 
                 {/* MISSILE */}
                 {data.type === ObjectType.MISSILE && (
                     <group rotation={[Math.PI / 2, 0, 0]}>
-                        <mesh geometry={MISSILE_CORE_GEO}>
-                            <meshStandardMaterial color="#ff0000" emissive="#ff0000" emissiveIntensity={4} />
-                        </mesh>
-                        <mesh position={[0, 1.0, 0]} geometry={MISSILE_RING_GEO}>
-                            <meshBasicMaterial color="#ffff00" />
-                        </mesh>
-                        <mesh position={[0, 0, 0]} geometry={MISSILE_RING_GEO}>
-                            <meshBasicMaterial color="#ffff00" />
-                        </mesh>
-                        <mesh position={[0, -1.0, 0]} geometry={MISSILE_RING_GEO}>
-                            <meshBasicMaterial color="#ffff00" />
-                        </mesh>
+                        <mesh geometry={MISSILE_CORE_GEO}><meshStandardMaterial color="#ff0000" emissive="#ff0000" emissiveIntensity={4} /></mesh>
+                        <mesh position={[0, 1.0, 0]} geometry={MISSILE_RING_GEO}><meshBasicMaterial color="#ffff00" /></mesh>
+                        <mesh position={[0, 0, 0]} geometry={MISSILE_RING_GEO}><meshBasicMaterial color="#ffff00" /></mesh>
+                        <mesh position={[0, -1.0, 0]} geometry={MISSILE_RING_GEO}><meshBasicMaterial color="#ffff00" /></mesh>
                     </group>
                 )}
                 
-                {/* PROJECTILE (FIREBALL) */}
-                {data.type === ObjectType.PROJECTILE && (
-                    <mesh geometry={PROJECTILE_GEO}>
-                        <meshBasicMaterial color="#ff5500" />
-                    </mesh>
-                )}
+                {/* PROJECTILE */}
+                {data.type === ObjectType.PROJECTILE && <mesh geometry={PROJECTILE_GEO}><meshBasicMaterial color="#ff5500" /></mesh>}
 
                 {/* GEM */}
-                {data.type === ObjectType.GEM && (
-                    <mesh castShadow geometry={GEM_GEOMETRY}>
-                        <meshStandardMaterial color={data.color} roughness={0} metalness={1} emissive={data.color} emissiveIntensity={2} />
-                    </mesh>
-                )}
+                {data.type === ObjectType.GEM && <mesh castShadow geometry={GEM_GEOMETRY}><meshStandardMaterial color={data.color} roughness={0} metalness={1} emissive={data.color} emissiveIntensity={2} /></mesh>}
 
-                {/* CHINESE CHAR (Formerly LETTER) */}
-                {data.type === ObjectType.LETTER && data.value && (
-                    <CharSprite value={data.value} color={data.color || '#fff'} />
-                )}
+                {/* CHINESE CHAR */}
+                {data.type === ObjectType.LETTER && data.value && <CharSprite value={data.value} color={data.color || '#fff'} />}
             </group>
         </group>
     );

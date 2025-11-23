@@ -6,11 +6,11 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings } from 'lucide-react';
+import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers } from 'lucide-react';
 import { useStore } from '../../store';
-import { GameStatus, ShopItem, RUN_SPEED_BASE } from '../../types';
+import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty } from '../../types';
 import { audio } from '../System/Audio';
-import { LESSON_NAMES } from '../../store';
+import { LESSON_NAMES, LESSON_DATA } from '../../store';
 
 // Available Shop Items (Traditional Chinese)
 const SHOP_ITEMS: ShopItem[] = [
@@ -189,7 +189,7 @@ const MobileControls: React.FC = () => {
     useEffect(() => {
         const interval = setInterval(() => {
             const now = Date.now();
-            if (hasFireball) setFireballCooldown(Math.max(0, 5000 - (now - lastFireballTime))); // Cooldown reduced to 5000ms
+            if (hasFireball) setFireballCooldown(Math.max(0, 5000 - (now - lastFireballTime))); 
             if (hasFlight) {
                 if (!isFlying) setFlightCooldown(Math.max(0, 20000 - (now - lastFlightEndTime)));
                 else setFlightCooldown(0);
@@ -292,15 +292,17 @@ const MobileControls: React.FC = () => {
 
 export const HUD: React.FC = () => {
   const { 
-    score, lives, maxLives, status, level, restartGame, startGame, gemsCollected, 
+    score, lives, maxLives, status, restartGame, startGame, 
     distance, isImmortalityActive, speed, currentVocab, totalCorrectAnswers, 
     isManualSlowMotion, toggleLesson, selectedLessonIds, 
     victoryTarget, setVictoryTarget, highScore, consecutiveIgnores,
-    startingLivesSetting, setStartingLives, maxSpeedSetting, setMaxSpeed
+    startingLivesSetting, setStartingLives, maxSpeedSetting, setMaxSpeed,
+    difficulty, setDifficulty
   } = useStore();
 
   const [imageError, setImageError] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [activeTab, setActiveTab] = useState<'KX' | 'HL' | 'NY'>('HL'); // Default to Hanlin
   
   useEffect(() => {
       const handleOnline = () => setIsOffline(false);
@@ -329,9 +331,9 @@ export const HUD: React.FC = () => {
   if (status === GameStatus.MENU) {
       return (
           <div className="absolute inset-0 flex items-center justify-center z-[100] bg-black/80 backdrop-blur-sm p-4 pointer-events-auto overflow-y-auto">
-              <div className="relative w-full max-w-2xl rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,255,255,0.2)] border border-white/10 animate-in zoom-in-95 duration-500 my-8">
+              <div className="relative w-full max-w-3xl rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,255,255,0.2)] border border-white/10 animate-in zoom-in-95 duration-500 my-4">
                 <div className="relative w-full bg-gray-900 flex flex-col">
-                     <div className="relative h-48 md:h-64 overflow-hidden bg-gray-900">
+                     <div className="relative h-48 md:h-56 overflow-hidden bg-gray-900 shrink-0">
                         {!imageError ? (
                             <img 
                                 src="https://www.gstatic.com/aistudio/starter-apps/gemini_runner/gemini_runner.png" 
@@ -381,7 +383,7 @@ export const HUD: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 {/* Starting Lives */}
                                 <div>
                                     <div className="text-sm text-gray-400 mb-2 flex items-center"><Heart className="w-3 h-3 mr-1"/> 初始生命</div>
@@ -422,30 +424,83 @@ export const HUD: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Difficulty Selector */}
+                            <div>
+                                <div className="text-sm text-gray-400 mb-2 flex items-center"><AlertTriangle className="w-3 h-3 mr-1"/> 障礙難度</div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setDifficulty(Difficulty.SIMPLE)}
+                                        className={`flex-1 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center ${
+                                            difficulty === Difficulty.SIMPLE
+                                            ? 'bg-green-600 text-white shadow-lg' 
+                                            : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                        }`}
+                                    >
+                                        簡單 (一般)
+                                    </button>
+                                    <button
+                                        onClick={() => setDifficulty(Difficulty.COMPLEX)}
+                                        className={`flex-1 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center ${
+                                            difficulty === Difficulty.COMPLEX
+                                            ? 'bg-red-600 text-white shadow-lg border border-red-400' 
+                                            : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                        }`}
+                                    >
+                                        複雜 (挑戰)
+                                    </button>
+                                </div>
+                                <div className="text-[10px] text-gray-500 mt-1 text-center">
+                                    {difficulty === Difficulty.COMPLEX ? "會出現需「二段跳」的高牆與需「跳躍/攻擊」的寬牆" : "僅出現標準障礙物"}
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Lesson Selector (Multi-select) */}
+                        {/* Lesson Selector (Tabbed Interface) */}
                         <div className="mb-8">
                             <div className="flex items-center justify-center text-cyan-400 mb-4 font-bold text-lg">
                                 <BookOpen className="w-5 h-5 mr-2" /> 
-                                <span>請選擇題庫 (可複選)</span>
+                                <span>題庫選擇 (可複選)</span>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-                                {Object.entries(LESSON_NAMES).map(([id, name]) => {
-                                    const isSelected = selectedLessonIds.includes(id);
-                                    return (
-                                        <button
-                                            key={id}
-                                            onClick={() => toggleLesson(id)}
-                                            className={`p-3 rounded-lg border text-sm font-bold transition-all flex items-center justify-between ${isSelected 
-                                                ? 'bg-cyan-900/60 border-cyan-400 text-white shadow-[0_0_10px_rgba(0,255,255,0.2)]' 
-                                                : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-500 hover:bg-gray-800'}`}
-                                        >
-                                            <span>{name}</span>
-                                            {isSelected ? <CheckSquare className="w-5 h-5 text-cyan-400" /> : <Square className="w-5 h-5 text-gray-600" />}
-                                        </button>
-                                    );
+
+                            {/* Publisher Tabs */}
+                            <div className="flex space-x-2 mb-4">
+                                <button onClick={() => setActiveTab('KX')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'KX' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>康軒</button>
+                                <button onClick={() => setActiveTab('HL')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'HL' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>翰林</button>
+                                <button onClick={() => setActiveTab('NY')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'NY' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>南一</button>
+                            </div>
+
+                            {/* Lesson List Grid (1-12) */}
+                            <div className="grid grid-cols-4 gap-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar bg-gray-800/30 p-3 rounded-b-lg">
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
+                                        const id = `${activeTab}_${num}`;
+                                        const isSelected = selectedLessonIds.includes(id);
+                                        const vocabList = LESSON_DATA[id] || [];
+                                        const previewText = vocabList.length > 0 
+                                            ? vocabList.slice(0, 3).map(v => v.char).join('、') 
+                                            : '無預覽';
+
+                                        return (
+                                            <button
+                                                key={id}
+                                                onClick={() => toggleLesson(id)}
+                                                className={`group relative aspect-square rounded-lg border text-xs font-bold transition-all flex flex-col items-center justify-center ${isSelected 
+                                                    ? 'bg-cyan-900/60 border-cyan-400 text-white shadow-[0_0_5px_rgba(0,255,255,0.2)]' 
+                                                    : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-500 hover:bg-gray-800'}`}
+                                            >
+                                                <span className={`text-2xl md:text-3xl font-black mb-1 ${isSelected ? 'text-cyan-400' : 'text-gray-500'}`}>{num}</span>
+                                                {isSelected && <div className="absolute top-1 right-1 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]"></div>}
+                                                
+                                                {/* Hover Tooltip for Content Preview */}
+                                                <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-[10px] text-gray-300 py-1 px-1 text-center opacity-0 group-hover:opacity-100 transition-opacity truncate rounded-b-lg">
+                                                    {previewText}...
+                                                </div>
+                                            </button>
+                                        );
                                 })}
+                            </div>
+                             <div className="mt-2 text-right text-xs text-gray-500">
+                                已選擇 {selectedLessonIds.length} 個題庫
                             </div>
                         </div>
 
@@ -558,22 +613,16 @@ export const HUD: React.FC = () => {
              <div className="text-sm md:text-lg text-purple-300 font-bold tracking-wider font-mono bg-black/50 px-3 py-1 rounded-full border border-purple-500/30 backdrop-blur-sm">
                 答題進度: {totalCorrectAnswers} / {victoryTarget}
              </div>
-             <div className="text-[10px] text-gray-400 mt-1">{selectedLessonIds.length > 1 ? `多重題庫 (${selectedLessonIds.length})` : LESSON_NAMES[selectedLessonIds[0]]}</div>
+             <div className="text-[10px] text-gray-400 mt-1">
+                 {selectedLessonIds.length > 1 ? `多重題庫 (${selectedLessonIds.length})` : LESSON_NAMES[selectedLessonIds[0]]}
+             </div>
         </div>
 
         {/* QUESTION DISPLAY */}
         {currentVocab && (
              <div className="absolute top-20 md:top-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in duration-300">
-                {/* HINT SYSTEM: Show if ignored 3+ times */}
-                {consecutiveIgnores >= 3 && (
-                    <div className="mb-2 animate-bounce flex flex-col items-center">
-                        <div className="text-xs text-yellow-300 mb-1 font-bold tracking-widest">提示: 正解為</div>
-                        <div className="text-4xl font-black text-yellow-400 bg-black/80 px-4 py-1 rounded-lg border border-yellow-500 shadow-[0_0_15px_gold]">
-                            {currentVocab.char}
-                        </div>
-                    </div>
-                )}
                 
+                {/* QUESTION BOX */}
                 <div className="bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-2xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.3)] min-w-[280px] md:min-w-[400px] text-center">
                     <div className="flex items-center justify-center space-x-2 mb-2 text-cyan-400 opacity-80 text-sm font-mono tracking-widest">
                         <HelpCircle className="w-4 h-4" /> 
@@ -583,6 +632,16 @@ export const HUD: React.FC = () => {
                         {currentVocab.question}
                     </div>
                 </div>
+
+                {/* HINT SYSTEM: Show below question box */}
+                {consecutiveIgnores >= 3 && (
+                    <div className="mt-4 animate-bounce flex flex-col items-center">
+                        <div className="text-xs text-yellow-300 mb-1 font-bold tracking-widest">提示: 正解為</div>
+                        <div className="text-4xl font-black text-yellow-400 bg-black/80 px-4 py-1 rounded-lg border border-yellow-500 shadow-[0_0_15px_gold]">
+                            {currentVocab.char}
+                        </div>
+                    </div>
+                )}
              </div>
         )}
 

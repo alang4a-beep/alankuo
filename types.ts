@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -23,6 +24,11 @@ export enum ObjectType {
   PROJECTILE = 'PROJECTILE'
 }
 
+export enum Difficulty {
+  SIMPLE = 'SIMPLE',
+  COMPLEX = 'COMPLEX'
+}
+
 export interface VocabItem {
     char: string;
     question: string; // e.g., "保 ( ? ) 護"
@@ -45,6 +51,7 @@ export interface GameObject {
   isTarget?: boolean; // If this object is the correct answer
   points?: number; // Score value for gems
   hasFired?: boolean; // For Aliens
+  variant?: 'normal' | 'tall'; // For obstacle variations
 }
 
 export const LANE_WIDTH = 2.2;
@@ -113,8 +120,7 @@ declare global {
       bufferAttribute: any;
       color: any;
 
-      // Catch-all to allow standard HTML elements (div, span, etc.) 
-      // which might be missing from this interface definition depending on the environment
+      // Catch-all to allow standard HTML elements
       [elemName: string]: any;
     }
   }
