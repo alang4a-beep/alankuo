@@ -62,8 +62,8 @@
 </head>
   <body>
     <div id="root"></div>
-    <!-- 修正路徑：使用 ./src/index.tsx 以確保相對路徑正確 -->
-    <script type="module" src="./src/index.tsx"></script>
+    <!-- 修正：將路徑改為 /index.tsx，指向根目錄的檔案 -->
+    <script type="module" src="/index.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
