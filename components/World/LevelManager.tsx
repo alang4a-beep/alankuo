@@ -196,7 +196,8 @@ export const LevelManager: React.FC = () => {
     openShop,
     level,
     isManualSlowMotion,
-    addScore
+    addScore,
+    registerIgnore
   } = useStore();
   
   const objectsRef = useRef<GameObject[]>([]);
@@ -467,6 +468,11 @@ export const LevelManager: React.FC = () => {
         }
 
         if (obj.position[2] > REMOVE_DISTANCE && obj.type !== ObjectType.PROJECTILE) {
+            // Logic for detecting ignored/missed answers
+            if (obj.type === ObjectType.LETTER && obj.isTarget && obj.active) {
+                registerIgnore();
+            }
+
             keep = false;
             hasChanges = true;
         }
@@ -490,10 +496,6 @@ export const LevelManager: React.FC = () => {
     // Always ensure spawn buffer
     if (furthestZ > -SPAWN_DISTANCE) {
          const minGap = Math.min(12 + (speed * 0.4), 45); 
-         
-         // Logic relative to distance travelled for Questions, but regular obstacles spawn based on gap
-         // Wait... the spawnZ logic here keeps appending to the END of the stream.
-         // If furthestZ is -20 (very close), and we spawn at -20 - minGap, we are good.
          
          const spawnZ = Math.min(furthestZ - minGap, -SPAWN_DISTANCE);
          

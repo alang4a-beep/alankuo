@@ -158,6 +158,7 @@ interface GameState {
   
   currentVocabList: VocabItem[];
   currentVocab: VocabItem | null;
+  consecutiveIgnores: number; // How many times the correct answer was missed
   
   correctAnswersCount: number; // Current level progress
   totalCorrectAnswers: number; // Total game progress
@@ -170,6 +171,10 @@ interface GameState {
   gemsCollected: number;
   distance: number;
   
+  // Settings
+  startingLivesSetting: number;
+  maxSpeedSetting: number; // 0 for unlimited
+
   // Inventory / Abilities
   hasDoubleJump: boolean;
   hasImmortality: boolean;
@@ -197,6 +202,9 @@ interface GameState {
   // Actions
   toggleLesson: (id: string) => void;
   setVictoryTarget: (target: number) => void;
+  setStartingLives: (lives: number) => void;
+  setMaxSpeed: (speed: number) => void;
+  registerIgnore: () => void;
   
   startGame: () => void;
   restartGame: () => void;
@@ -241,6 +249,7 @@ export const useStore = create<GameState>((set, get) => ({
   
   currentVocabList: LESSON_DATA['L6'],
   currentVocab: null,
+  consecutiveIgnores: 0,
   
   correctAnswersCount: 0,
   totalCorrectAnswers: 0,
@@ -252,6 +261,9 @@ export const useStore = create<GameState>((set, get) => ({
   gemsCollected: 0,
   distance: 0,
   
+  startingLivesSetting: 3,
+  maxSpeedSetting: 100,
+
   hasDoubleJump: false,
   hasImmortality: false,
   isImmortalityActive: false,
@@ -288,6 +300,10 @@ export const useStore = create<GameState>((set, get) => ({
   },
   
   setVictoryTarget: (target) => set({ victoryTarget: target }),
+  setStartingLives: (lives) => set({ startingLivesSetting: lives }),
+  setMaxSpeed: (speed) => set({ maxSpeedSetting: speed }),
+  
+  registerIgnore: () => set(state => ({ consecutiveIgnores: state.consecutiveIgnores + 1 })),
 
   saveData: () => {
       const state = get();
@@ -330,7 +346,7 @@ export const useStore = create<GameState>((set, get) => ({
   },
 
   startGame: () => {
-    const { selectedLessonIds } = get();
+    const { selectedLessonIds, startingLivesSetting, maxLives } = get();
     
     // Aggregate Vocabulary
     let combinedList: VocabItem[] = [];
@@ -346,14 +362,22 @@ export const useStore = create<GameState>((set, get) => ({
 
     const randomVocab = combinedList[Math.floor(Math.random() * combinedList.length)];
     
+    // Determine actual max lives based on upgrades + setting
+    // The player's purchased upgrade (maxLives) might be higher than default 3.
+    // We should respect the starting setting but allow upgraded max.
+    // Logic: If user bought upgrades, maxLives is e.g. 4. If they pick "Start 5", current lives = 5, max = max(4,5).
+    const actualLives = startingLivesSetting;
+    const newMaxLives = Math.max(maxLives, actualLives);
+    
     set({ 
         status: GameStatus.PLAYING, 
         currentVocabList: combinedList, 
         score: 0, 
-        lives: 3, 
-        // maxLives: 3, // Don't reset maxLives, keep purchased upgrades
+        lives: actualLives,
+        maxLives: newMaxLives,
         speed: RUN_SPEED_BASE,
         currentVocab: randomVocab,
+        consecutiveIgnores: 0,
         correctAnswersCount: 0,
         totalCorrectAnswers: 0,
         targetCountForLevel: ANSWERS_PER_LEVEL,
@@ -376,16 +400,21 @@ export const useStore = create<GameState>((set, get) => ({
   },
 
   restartGame: () => {
+    const { startingLivesSetting, maxLives } = get();
     const list = get().currentVocabList;
     const randomVocab = list[Math.floor(Math.random() * list.length)];
     
+    const actualLives = startingLivesSetting;
+    const newMaxLives = Math.max(maxLives, actualLives);
+
     set({ 
         status: GameStatus.PLAYING, 
         score: 0, 
-        lives: 3, 
-        // Keep Max Lives
+        lives: actualLives,
+        maxLives: newMaxLives,
         speed: RUN_SPEED_BASE,
         currentVocab: randomVocab,
+        consecutiveIgnores: 0,
         correctAnswersCount: 0,
         totalCorrectAnswers: 0,
         targetCountForLevel: ANSWERS_PER_LEVEL,
@@ -448,7 +477,7 @@ export const useStore = create<GameState>((set, get) => ({
   setManualSlowMotion: (active) => set({ isManualSlowMotion: active }),
 
   submitAnswer: (char) => {
-    const { currentVocab, correctAnswersCount, totalCorrectAnswers, targetCountForLevel, speed, takeDamage, currentVocabList, wrongAnswers, hasPassiveHeal, passiveHealCounter, lives, maxLives, victoryTarget, addScore } = get();
+    const { currentVocab, correctAnswersCount, totalCorrectAnswers, targetCountForLevel, speed, takeDamage, currentVocabList, wrongAnswers, hasPassiveHeal, passiveHealCounter, lives, maxLives, victoryTarget, addScore, maxSpeedSetting } = get();
     
     if (currentVocab && char === currentVocab.char) {
         // CORRECT
@@ -468,6 +497,13 @@ export const useStore = create<GameState>((set, get) => ({
         }
         
         const speedIncrease = RUN_SPEED_BASE * 0.05;
+        let nextSpeed = speed + speedIncrease;
+        
+        // Cap Speed
+        if (maxSpeedSetting > 0 && nextSpeed > maxSpeedSetting) {
+            nextSpeed = maxSpeedSetting;
+        }
+
         const nextVocab = currentVocabList[Math.floor(Math.random() * currentVocabList.length)];
 
         addScore(500); // Reward (Handles High Score Save inside addScore)
@@ -476,7 +512,8 @@ export const useStore = create<GameState>((set, get) => ({
             correctAnswersCount: newLevelCount,
             totalCorrectAnswers: newTotalCount,
             currentVocab: nextVocab,
-            speed: speed + speedIncrease,
+            consecutiveIgnores: 0, // Reset ignores on success
+            speed: nextSpeed,
             passiveHealCounter: newHealCounter
         });
 
@@ -509,10 +546,15 @@ export const useStore = create<GameState>((set, get) => ({
   },
 
   advanceLevel: () => {
-      const { level, laneCount, speed } = get();
+      const { level, laneCount, speed, maxSpeedSetting } = get();
       const nextLevel = level + 1;
       const speedIncrease = RUN_SPEED_BASE * 0.20;
-      const newSpeed = speed + speedIncrease;
+      let newSpeed = speed + speedIncrease;
+      
+      // Cap Speed
+      if (maxSpeedSetting > 0 && newSpeed > maxSpeedSetting) {
+          newSpeed = maxSpeedSetting;
+      }
 
       set({
           level: nextLevel,

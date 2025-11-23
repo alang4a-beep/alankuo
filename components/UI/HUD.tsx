@@ -6,7 +6,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff } from 'lucide-react';
+import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings } from 'lucide-react';
 import { useStore } from '../../store';
 import { GameStatus, ShopItem, RUN_SPEED_BASE } from '../../types';
 import { audio } from '../System/Audio';
@@ -291,7 +291,14 @@ const MobileControls: React.FC = () => {
 }
 
 export const HUD: React.FC = () => {
-  const { score, lives, maxLives, status, level, restartGame, startGame, gemsCollected, distance, isImmortalityActive, speed, currentVocab, totalCorrectAnswers, isManualSlowMotion, toggleLesson, selectedLessonIds, victoryTarget, setVictoryTarget, highScore } = useStore();
+  const { 
+    score, lives, maxLives, status, level, restartGame, startGame, gemsCollected, 
+    distance, isImmortalityActive, speed, currentVocab, totalCorrectAnswers, 
+    isManualSlowMotion, toggleLesson, selectedLessonIds, 
+    victoryTarget, setVictoryTarget, highScore, consecutiveIgnores,
+    startingLivesSetting, setStartingLives, maxSpeedSetting, setMaxSpeed
+  } = useStore();
+
   const [imageError, setImageError] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   
@@ -348,26 +355,72 @@ export const HUD: React.FC = () => {
 
                      <div className="p-6 md:p-8 bg-gradient-to-b from-[#050011] to-gray-900">
                         
-                        {/* Game Goal Selector */}
-                        <div className="mb-6">
-                            <div className="flex items-center justify-center text-yellow-400 mb-4 font-bold text-lg">
-                                <Target className="w-5 h-5 mr-2" /> 
-                                <span>設定挑戰題數</span>
+                        {/* --- Game Settings Section --- */}
+                        <div className="mb-6 bg-gray-800/40 rounded-xl p-4 border border-gray-700">
+                            <div className="flex items-center text-gray-300 font-bold mb-4">
+                                <Settings className="w-4 h-4 mr-2" /> 遊戲設定
                             </div>
-                            <div className="flex justify-center gap-4">
-                                {[20, 30, 40].map((target) => (
-                                    <button
-                                        key={target}
-                                        onClick={() => setVictoryTarget(target)}
-                                        className={`px-6 py-2 rounded-full font-bold text-sm md:text-base transition-all ${
-                                            victoryTarget === target 
-                                            ? 'bg-yellow-500 text-black shadow-[0_0_15px_gold] scale-105' 
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                        }`}
-                                    >
-                                        {target} 題
-                                    </button>
-                                ))}
+                            
+                            {/* Target Count */}
+                            <div className="mb-4">
+                                <div className="text-sm text-gray-400 mb-2 flex items-center"><Target className="w-3 h-3 mr-1"/> 挑戰題數</div>
+                                <div className="flex gap-2">
+                                    {[20, 30, 40].map((target) => (
+                                        <button
+                                            key={target}
+                                            onClick={() => setVictoryTarget(target)}
+                                            className={`flex-1 py-1.5 rounded-md text-sm font-bold transition-all ${
+                                                victoryTarget === target 
+                                                ? 'bg-yellow-500 text-black shadow-lg' 
+                                                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            {target} 題
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Starting Lives */}
+                                <div>
+                                    <div className="text-sm text-gray-400 mb-2 flex items-center"><Heart className="w-3 h-3 mr-1"/> 初始生命</div>
+                                    <div className="flex gap-2">
+                                        {[3, 5, 8].map((val) => (
+                                            <button
+                                                key={val}
+                                                onClick={() => setStartingLives(val)}
+                                                className={`flex-1 py-1.5 rounded-md text-sm font-bold transition-all ${
+                                                    startingLivesSetting === val 
+                                                    ? 'bg-pink-500 text-white shadow-lg' 
+                                                    : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                                }`}
+                                            >
+                                                {val}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Max Speed */}
+                                <div>
+                                    <div className="text-sm text-gray-400 mb-2 flex items-center"><Zap className="w-3 h-3 mr-1"/> 最高速度</div>
+                                    <div className="flex gap-2">
+                                        {[100, 150, 0].map((val) => (
+                                            <button
+                                                key={val}
+                                                onClick={() => setMaxSpeed(val)}
+                                                className={`flex-1 py-1.5 rounded-md text-sm font-bold transition-all ${
+                                                    maxSpeedSetting === val 
+                                                    ? 'bg-cyan-500 text-white shadow-lg' 
+                                                    : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                                }`}
+                                            >
+                                                {val === 0 ? '無限' : val}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -377,7 +430,7 @@ export const HUD: React.FC = () => {
                                 <BookOpen className="w-5 h-5 mr-2" /> 
                                 <span>請選擇題庫 (可複選)</span>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                                 {Object.entries(LESSON_NAMES).map(([id, name]) => {
                                     const isSelected = selectedLessonIds.includes(id);
                                     return (
@@ -511,6 +564,16 @@ export const HUD: React.FC = () => {
         {/* QUESTION DISPLAY */}
         {currentVocab && (
              <div className="absolute top-20 md:top-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in duration-300">
+                {/* HINT SYSTEM: Show if ignored 3+ times */}
+                {consecutiveIgnores >= 3 && (
+                    <div className="mb-2 animate-bounce flex flex-col items-center">
+                        <div className="text-xs text-yellow-300 mb-1 font-bold tracking-widest">提示: 正解為</div>
+                        <div className="text-4xl font-black text-yellow-400 bg-black/80 px-4 py-1 rounded-lg border border-yellow-500 shadow-[0_0_15px_gold]">
+                            {currentVocab.char}
+                        </div>
+                    </div>
+                )}
+                
                 <div className="bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-2xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.3)] min-w-[280px] md:min-w-[400px] text-center">
                     <div className="flex items-center justify-center space-x-2 mb-2 text-cyan-400 opacity-80 text-sm font-mono tracking-widest">
                         <HelpCircle className="w-4 h-4" /> 
