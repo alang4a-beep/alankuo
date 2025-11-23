@@ -1,0 +1,17 @@
+
+{
+  "name": "生字跑酷 (Gemini Runner)",
+  "short_name": "生字跑酷",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "background_color": "#050011",
+  "theme_color": "#00ffff",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "https://www.gstatic.com/aistudio/starter-apps/gemini_runner/gemini_runner.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
