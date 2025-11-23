@@ -77,7 +77,8 @@ function App() {
   }, [loadData]);
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden select-none">
+    // Use style={{ height: '100dvh' }} to fix mobile browser bottom bar overlap issues
+    <div className="relative w-full bg-black overflow-hidden select-none" style={{ height: '100dvh' }}>
       <HUD />
       <Canvas
         shadows

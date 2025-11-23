@@ -112,49 +112,10 @@ declare global {
       // Utils
       bufferAttribute: any;
       color: any;
-    }
-  }
-  
-  // Augment React.JSX namespace for newer React types compatibility
-  namespace React {
-    namespace JSX {
-      interface IntrinsicElements {
-        // Objects
-        group: any;
-        mesh: any;
-        points: any;
-        instancedMesh: any;
-        primitive: any;
 
-        // Geometries
-        bufferGeometry: any;
-        planeGeometry: any;
-        boxGeometry: any;
-        sphereGeometry: any;
-        cylinderGeometry: any;
-        coneGeometry: any;
-        ringGeometry: any;
-        torusGeometry: any;
-        circleGeometry: any;
-        octahedronGeometry: any;
-        icosahedronGeometry: any;
-
-        // Materials
-        meshBasicMaterial: any;
-        meshStandardMaterial: any;
-        pointsMaterial: any;
-        shaderMaterial: any;
-
-        // Lights & Environment
-        ambientLight: any;
-        directionalLight: any;
-        pointLight: any;
-        fog: any;
-        
-        // Utils
-        bufferAttribute: any;
-        color: any;
-      }
+      // Catch-all to allow standard HTML elements (div, span, etc.) 
+      // which might be missing from this interface definition depending on the environment
+      [elemName: string]: any;
     }
   }
 }

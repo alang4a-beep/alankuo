@@ -203,7 +203,11 @@ const MobileControls: React.FC = () => {
     }, [hasFireball, lastFireballTime, hasFlight, isFlying, lastFlightEndTime, hasGemDoubler, isGemDoublerActive, nextGemDoublerAvailableTime]);
 
     return (
-        <div className="absolute inset-0 pointer-events-none flex flex-col justify-end pb-4 px-4 z-[60]">
+        // Updated padding to be safe from bottom bars (pb-8) and added style for safe-area support
+        <div 
+            className="absolute inset-0 pointer-events-none flex flex-col justify-end pb-8 px-4 z-[60]"
+            style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
+        >
             <div className="flex justify-between items-end w-full">
                 {/* Left: Slow Motion Button (Hold) */}
                 <div className="pointer-events-auto">
