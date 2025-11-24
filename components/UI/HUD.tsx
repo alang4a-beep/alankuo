@@ -6,14 +6,44 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal, Baby, PauseCircle, Home, RotateCcw, Percent } from 'lucide-react';
+import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal, Baby, PauseCircle, Home, RotateCcw, Percent, Palette, Infinity } from 'lucide-react';
 import { useStore } from '../../store';
-import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty, PetID } from '../../types';
+import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty, PetID, ThemeID } from '../../types';
 import { audio } from '../System/Audio';
 import { LESSON_NAMES, LESSON_DATA } from '../../store';
 
-// Available Shop Items
+// Available Shop Items - Sorted by Cost (Low to High)
 const SHOP_ITEMS: ShopItem[] = [
+    {
+        id: 'DOUBLE_JUMP',
+        name: '二段跳躍',
+        description: '可在空中再次跳躍，對於高處障礙物非常重要。',
+        cost: 1000,
+        icon: ArrowUpCircle,
+        oneTime: true
+    },
+    {
+        id: 'HEAL',
+        name: '修復工具包',
+        description: '立即恢復 1 點生命值。',
+        cost: 1000,
+        icon: PlusCircle
+    },
+    {
+        id: 'FIREBALL',
+        name: '烈焰衝擊',
+        description: '解鎖技能：按下 X 發射火焰摧毀障礙，並獲得 500 寶石 (極速冷卻 1 秒)。',
+        cost: 1500,
+        icon: Flame,
+        oneTime: true
+    },
+    {
+        id: 'MAX_LIFE',
+        name: '提升生命上限',
+        description: '永久增加一個生命格並恢復生命。',
+        cost: 1500,
+        icon: Activity
+    },
     {
         id: 'MAGNET',
         name: '強力磁鐵',
@@ -23,12 +53,45 @@ const SHOP_ITEMS: ShopItem[] = [
         oneTime: true
     },
     {
+        id: 'FLIGHT',
+        name: '噴射飛行',
+        description: '按下 C 鍵飛行越過障礙 (10秒)，再次按下 C 鍵降落 (冷卻 20 秒)。',
+        cost: 2000,
+        icon: Rocket,
+        oneTime: true
+    },
+    {
         id: 'GEM_DOUBLER',
         name: '寶石增幅器',
         description: '被動技能：購買後「自動生效」，獲得的寶石數量翻倍 (x2)！',
         cost: 3000,
         icon: Diamond,
         oneTime: true
+    },
+    {
+        id: 'PASSIVE_HEAL',
+        name: '生命充能',
+        description: '被動技能：每答對 3 題自動恢復 1 點生命。',
+        cost: 3000,
+        icon: Heart,
+        oneTime: true
+    },
+    {
+        id: 'IMMORTAL',
+        name: '無敵模式',
+        description: '解鎖技能：按下 Enter/Z 鍵即可無敵 5 秒。',
+        cost: 3000,
+        icon: Shield,
+        oneTime: true
+    },
+    {
+        id: 'PET_MECHA',
+        name: '暗夜機甲翼',
+        description: '被動技能：裝備後，選錯字不會扣除生命值 (撞到障礙物仍會受傷)。',
+        cost: 4500,
+        icon: Shield,
+        oneTime: true,
+        petId: PetID.MECHA
     },
     {
         id: 'PET_MARIO',
@@ -49,75 +112,40 @@ const SHOP_ITEMS: ShopItem[] = [
         petId: PetID.PIKACHU
     },
     {
-        id: 'PET_MECHA',
-        name: '暗夜機甲翼',
-        description: '被動技能：裝備後，選錯字不會扣除生命值 (撞到障礙物仍會受傷)。',
-        cost: 4500,
-        icon: Shield,
-        oneTime: true,
-        petId: PetID.MECHA
-    },
-    {
-        id: 'DOUBLE_JUMP',
-        name: '二段跳躍',
-        description: '可在空中再次跳躍，對於高處障礙物非常重要。',
-        cost: 1000,
-        icon: ArrowUpCircle,
-        oneTime: true
-    },
-    {
-        id: 'FIREBALL',
-        name: '烈焰衝擊',
-        description: '解鎖技能：按下 X 發射火焰摧毀障礙，並獲得 500 寶石 (極速冷卻 1 秒)。',
-        cost: 1500,
+        id: 'THEME_INFERNO',
+        name: '主題：烈焰地獄',
+        description: '解鎖深紅與橘黃色系的「烈焰」背景主題，感受燃燒的跑道！(每10關輪替)',
+        cost: 8000,
         icon: Flame,
-        oneTime: true
+        oneTime: true,
+        themeId: ThemeID.INFERNO
     },
     {
-        id: 'FLIGHT',
-        name: '噴射飛行',
-        description: '按下 C 鍵飛行越過障礙 (10秒)，再次按下 C 鍵降落 (冷卻 20 秒)。',
-        cost: 2000,
-        icon: Rocket,
-        oneTime: true
+        id: 'THEME_GLACIER',
+        name: '主題：極地冰封',
+        description: '解鎖冰藍與白雪色系的「極地」背景主題，體驗寒冷的極速！(每10關輪替)',
+        cost: 8000,
+        icon: Wind, // Using Wind icon for cold/ice feel
+        oneTime: true,
+        themeId: ThemeID.GLACIER
     },
     {
-        id: 'PASSIVE_HEAL',
-        name: '生命充能',
-        description: '被動技能：每答對 3 題自動恢復 1 點生命。',
-        cost: 3000,
-        icon: Heart,
-        oneTime: true
-    },
-    {
-        id: 'IMMORTAL',
-        name: '無敵模式',
-        description: '解鎖技能：按下 Enter/Z 鍵即可無敵 5 秒。',
-        cost: 3000,
-        icon: Shield,
-        oneTime: true
-    },
-    {
-        id: 'MAX_LIFE',
-        name: '提升生命上限',
-        description: '永久增加一個生命格並恢復生命。',
-        cost: 1500,
-        icon: Activity
-    },
-    {
-        id: 'HEAL',
-        name: '修復工具包',
-        description: '立即恢復 1 點生命值。',
-        cost: 1000,
-        icon: PlusCircle
+        id: 'THEME_TOXIC',
+        name: '主題：荒野毒氣',
+        description: '解鎖酸綠與螢光色系的「荒野」背景主題，充滿危險的氣息！(每10關輪替)',
+        cost: 8000,
+        icon: Ghost,
+        oneTime: true,
+        themeId: ThemeID.TOXIC
     }
 ];
 
 const ShopScreen: React.FC = () => {
-    const { score, buyItem, closeShop, hasDoubleJump, hasImmortality, hasFireball, hasFlight, hasPassiveHeal, hasGemDoubler, hasMagnet, ownedPets, activePets, togglePet, lives, maxLives } = useStore();
+    const { score, buyItem, closeShop, hasDoubleJump, hasImmortality, hasFireball, hasFlight, hasPassiveHeal, hasGemDoubler, hasMagnet, ownedPets, activePets, togglePet, lives, maxLives, ownedThemes } = useStore();
 
     const isOwned = (item: ShopItem) => {
         if (item.petId) return ownedPets.includes(item.petId);
+        if (item.themeId) return ownedThemes.includes(item.themeId);
         switch (item.id) {
             case 'DOUBLE_JUMP': return hasDoubleJump;
             case 'IMMORTAL': return hasImmortality;
@@ -156,9 +184,12 @@ const ShopScreen: React.FC = () => {
                      {SHOP_ITEMS.map(item => {
                          const Icon = item.icon;
                          const owned = isOwned(item);
-                         const isSoldOut = item.oneTime && owned && !item.petId; // Skills are sold out
+                         // Logic: Sold out if one-time item is owned.
+                         // Exception: Pets can be toggled, Themes are passive unlocks.
+                         const isSoldOut = item.oneTime && owned && !item.petId && !item.themeId; 
                          const canAfford = score >= item.cost;
                          const isPet = !!item.petId;
+                         const isTheme = !!item.themeId;
                          const isEquipped = isPet && activePets.includes(item.petId!);
                          
                          return (
@@ -187,9 +218,13 @@ const ShopScreen: React.FC = () => {
                                      >
                                          {isEquipped ? '已裝備 (點擊卸下)' : '點擊裝備'}
                                      </button>
+                                 ) : isTheme && owned ? (
+                                     <div className="px-4 md:px-6 py-2 rounded font-bold w-full text-sm md:text-base bg-gray-800 text-yellow-400 border border-yellow-600/50 cursor-default">
+                                         已解鎖 (自動輪替)
+                                     </div>
                                  ) : (
                                      <button 
-                                        onClick={() => buyItem(item.id as any, item.cost, item.petId)}
+                                        onClick={() => buyItem(item.id as any, item.cost, item.petId, item.themeId)}
                                         disabled={!canAfford || isSoldOut}
                                         className={`px-4 md:px-6 py-2 rounded font-bold w-full text-sm md:text-base transition-colors ${
                                             isSoldOut 
@@ -218,6 +253,7 @@ const ShopScreen: React.FC = () => {
     );
 };
 
+// ... [WrongAnswerReview and MobileControls components remain unchanged] ...
 const WrongAnswerReview: React.FC = () => {
     const { wrongAnswers } = useStore();
     if (wrongAnswers.length === 0) return null;
@@ -343,7 +379,6 @@ const MobileControls: React.FC = () => {
     );
 }
 
-// --- Pause Screen ---
 const PauseScreen: React.FC = () => {
     const { setStatus, restartGame, returnToMenu } = useStore();
     return (
@@ -389,7 +424,8 @@ export const HUD: React.FC = () => {
     ttsEnabled, setTtsEnabled,
     devMode, toggleDevMode,
     returnToMenu,
-    wrongAnswers
+    wrongAnswers,
+    setSpeed
   } = useStore();
 
   const [imageError, setImageError] = useState(false);
@@ -492,17 +528,17 @@ export const HUD: React.FC = () => {
                             <div className="mb-4">
                                 <div className="text-sm text-gray-400 mb-2 flex items-center"><Target className="w-3 h-3 mr-1"/> 挑戰題數</div>
                                 <div className="flex gap-2">
-                                    {[20, 30, 40].map((target) => (
+                                    {[20, 30, 40, 0].map((target) => (
                                         <button
                                             key={target}
                                             onClick={() => setVictoryTarget(target)}
-                                            className={`flex-1 py-1.5 rounded-md text-sm font-bold transition-all ${
+                                            className={`flex-1 py-1.5 rounded-md text-sm font-bold transition-all flex items-center justify-center ${
                                                 victoryTarget === target 
                                                 ? 'bg-yellow-500 text-black shadow-lg' 
                                                 : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                                             }`}
                                         >
-                                            {target} 題
+                                            {target === 0 ? <Infinity className="w-4 h-4" /> : `${target} 題`}
                                         </button>
                                     ))}
                                 </div>
@@ -683,7 +719,7 @@ export const HUD: React.FC = () => {
                 <div className="grid grid-cols-1 gap-3 md:gap-4 text-center mb-6 w-full max-w-md">
                     <div className="bg-gray-900/80 p-3 md:p-4 rounded-lg border border-gray-700 flex items-center justify-between">
                         <div className="flex items-center text-yellow-400 text-sm md:text-base"><Trophy className="mr-2 w-4 h-4 md:w-5 md:h-5"/> 答題進度</div>
-                        <div className="text-xl md:text-2xl font-bold font-mono">{totalCorrectAnswers} / {victoryTarget}</div>
+                        <div className="text-xl md:text-2xl font-bold font-mono">{totalCorrectAnswers} / {victoryTarget === 0 ? '∞' : victoryTarget}</div>
                     </div>
                     <div className="bg-gray-900/80 p-3 md:p-4 rounded-lg border border-gray-700 flex items-center justify-between">
                         <div className="flex items-center text-green-400 text-sm md:text-base"><Percent className="mr-2 w-4 h-4 md:w-5 md:h-5"/> 正確率</div>
@@ -792,7 +828,7 @@ export const HUD: React.FC = () => {
         {/* Progress Indicator */}
         <div className="absolute top-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-50">
              <div className="text-sm md:text-lg text-purple-300 font-bold tracking-wider font-mono bg-black/50 px-3 py-1 rounded-full border border-purple-500/30 backdrop-blur-sm">
-                答題進度: {totalCorrectAnswers} / {victoryTarget}
+                答題進度: {totalCorrectAnswers} / {victoryTarget === 0 ? '∞' : victoryTarget}
              </div>
              <div className="text-[10px] text-gray-400 mt-1">
                  {selectedLessonIds.length > 1 ? `多重題庫 (${selectedLessonIds.length})` : selectedLessonIds.length === 1 ? LESSON_NAMES[selectedLessonIds[0]?.split('_')[0]] + ' ' + selectedLessonIds[0]?.split('_')[2] + '課' : '未選擇題庫'}
@@ -850,7 +886,8 @@ export const HUD: React.FC = () => {
         <MobileControls />
 
         {/* Bottom Overlay Speed Indicator & Offline Status */}
-        <div className="w-full flex justify-end items-end absolute bottom-20 right-4 pointer-events-none flex-col items-end space-y-2">
+        {/* Raised from bottom-20 to bottom-32 to avoid overlap with skill buttons */}
+        <div className="w-full flex justify-end items-end absolute bottom-32 right-4 pointer-events-none flex-col items-end space-y-2">
              {isOffline && (
                  <div className="flex items-center space-x-2 text-red-400 bg-black/50 px-2 py-1 rounded">
                      <WifiOff className="w-4 h-4" />
@@ -860,6 +897,13 @@ export const HUD: React.FC = () => {
              <div className="flex items-center space-x-2 text-cyan-500 opacity-70">
                  <Zap className={`w-4 h-4 md:w-6 md:h-6 ${isManualSlowMotion ? '' : 'animate-pulse'}`} />
                  <span className={`font-mono text-base md:text-xl ${isManualSlowMotion ? 'text-yellow-400' : ''}`}>速度 {speedPercent}%</span>
+                 
+                 {devMode && (
+                     <div className="flex space-x-1 ml-2 pointer-events-auto">
+                         <button onClick={() => setSpeed(Math.max(0, speed - 10))} className="px-2 py-0.5 bg-gray-800 text-white text-xs rounded border border-gray-600 active:bg-gray-700">-</button>
+                         <button onClick={() => setSpeed(speed + 10)} className="px-2 py-0.5 bg-gray-800 text-white text-xs rounded border border-gray-600 active:bg-gray-700">+</button>
+                     </div>
+                 )}
              </div>
         </div>
         

@@ -1,34 +1,29 @@
 
-
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
 
 
-import React, { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React, { useRef, useMemo, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '../../store';
-import { LANE_WIDTH, GameStatus } from '../../types';
+import { LANE_WIDTH, GameStatus, THEME_CONFIG } from '../../types';
 
 const StarField: React.FC = () => {
   const { speed, isManualSlowMotion, status } = useStore();
-  const count = 3000; // Increased star count for better density
+  const count = 3000; 
   const meshRef = useRef<THREE.Points>(null);
   
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       let x = (Math.random() - 0.5) * 400;
-      let y = (Math.random() - 0.5) * 200 + 50; // Keep mostly above horizon
+      let y = (Math.random() - 0.5) * 200 + 50; 
       
-      // Distribute Z randomly along the entire travel path plus buffer
-      // Range: -550 to 100 to ensure full coverage from start
       let z = -550 + Math.random() * 650;
 
-      // Exclude stars from the central play area
       if (Math.abs(x) < 15 && y > -5 && y < 20) {
           if (x < 0) x -= 15;
           else x += 15;
@@ -43,24 +38,20 @@ const StarField: React.FC = () => {
 
   useFrame((state, delta) => {
     if (!meshRef.current) return;
-    if (status === GameStatus.PAUSED) return; // Freeze on Pause
+    if (status === GameStatus.PAUSED) return; 
     
     const positions = meshRef.current.geometry.attributes.position.array as Float32Array;
-    let activeSpeed = speed > 0 ? speed : 2; // Always move slightly even when stopped
+    let activeSpeed = speed > 0 ? speed : 2; 
     
-    // Apply Speed Modifiers
     if (isManualSlowMotion) activeSpeed *= 0.3;
 
     for (let i = 0; i < count; i++) {
         let z = positions[i * 3 + 2];
-        z += activeSpeed * delta * 2.0; // Parallax effect
+        z += activeSpeed * delta * 2.0; 
         
-        // Reset when it passes the camera (z > 100 gives plenty of buffer behind camera)
         if (z > 100) {
-            // Reset far back with a random buffer to prevent "walls" of stars
             z = -550 - Math.random() * 50; 
             
-            // Re-randomize X/Y on respawn with exclusion logic
             let x = (Math.random() - 0.5) * 400;
             let y = (Math.random() - 0.5) * 200 + 50;
             
@@ -99,8 +90,18 @@ const StarField: React.FC = () => {
 };
 
 const LaneGuides: React.FC = () => {
-    const { laneCount } = useStore();
+    const { laneCount, getCurrentTheme } = useStore();
+    const floorMatRef = useRef<THREE.MeshBasicMaterial>(null);
     
+    useFrame(() => {
+        const themeID = getCurrentTheme();
+        const config = THEME_CONFIG[themeID];
+        if (floorMatRef.current) {
+            // Instant update, no lerp
+            floorMatRef.current.color.set(config.floor);
+        }
+    });
+
     const separators = useMemo(() => {
         const lines: number[] = [];
         const startX = -(laneCount * LANE_WIDTH) / 2;
@@ -113,10 +114,15 @@ const LaneGuides: React.FC = () => {
 
     return (
         <group position={[0, 0.02, 0]}>
-            {/* Lane Floor - Lowered slightly to -0.02 */}
+            {/* Lane Floor - Solid opaque base for high visibility */}
             <mesh position={[0, -0.02, -20]} rotation={[-Math.PI / 2, 0, 0]}>
                 <planeGeometry args={[laneCount * LANE_WIDTH, 200]} />
-                <meshBasicMaterial color="#1a0b2e" transparent opacity={0.9} />
+                <meshBasicMaterial 
+                    ref={floorMatRef}
+                    color="#000000" 
+                    transparent 
+                    opacity={0.85} 
+                />
             </mesh>
 
             {/* Lane Separators - Glowing Lines */}
@@ -124,9 +130,9 @@ const LaneGuides: React.FC = () => {
                 <mesh key={`sep-${i}`} position={[x, 0, -20]} rotation={[-Math.PI / 2, 0, 0]}>
                     <planeGeometry args={[0.05, 200]} /> 
                     <meshBasicMaterial 
-                        color="#00ffff" 
+                        color="#ffffff" 
                         transparent 
-                        opacity={0.4} 
+                        opacity={0.3} 
                     />
                 </mesh>
             ))}
@@ -134,16 +140,25 @@ const LaneGuides: React.FC = () => {
     );
 };
 
-const RetroSun: React.FC = () => {
-    const { status } = useStore();
+const RetroSun: React.FC<{ sunTop: string, sunBottom: string }> = ({ sunTop, sunBottom }) => {
+    const { status, getCurrentTheme } = useStore();
     const matRef = useRef<THREE.ShaderMaterial>(null);
     const sunGroupRef = useRef<THREE.Group>(null);
+    
+    useFrame((state, delta) => {
+        if (status === GameStatus.PAUSED) return; 
 
-    useFrame((state) => {
-        if (status === GameStatus.PAUSED) return; // Freeze on Pause
+        // Update colors instantly based on current props (which are derived from theme)
+        // However, props passed to this component might lag one frame if parent re-renders.
+        // Better to read theme directly if we want absolute sync, but props are cleaner for this component.
+        // To ensure "instant" change without parent re-render lag, we can read theme here too.
+        const themeID = getCurrentTheme();
+        const config = THEME_CONFIG[themeID];
 
         if (matRef.current) {
             matRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+            matRef.current.uniforms.uColorTop.value.set(config.sunTop);
+            matRef.current.uniforms.uColorBottom.value.set(config.sunBottom);
         }
         // Gentle bobbing
         if (sunGroupRef.current) {
@@ -154,13 +169,12 @@ const RetroSun: React.FC = () => {
 
     const uniforms = useMemo(() => ({
         uTime: { value: 0 },
-        uColorTop: { value: new THREE.Color('#ffe600') }, // Bright Yellow
-        uColorBottom: { value: new THREE.Color('#ff0077') } // Magenta/Pink
+        uColorTop: { value: new THREE.Color(sunTop) },
+        uColorBottom: { value: new THREE.Color(sunBottom) }
     }), []);
 
     return (
         <group ref={sunGroupRef} position={[0, 30, -180]}>
-            {/* Reduced Geometry for Mobile: 32 segments instead of 64 */}
             <mesh>
                 <sphereGeometry args={[35, 32, 32]} />
                 <shaderMaterial
@@ -182,24 +196,13 @@ const RetroSun: React.FC = () => {
                         uniform vec3 uColorBottom;
 
                         void main() {
-                            // 1. Basic Vertical Gradient
                             vec3 color = mix(uColorBottom, uColorTop, vUv.y);
-                            
-                            // 2. Synthwave Scanlines
                             float stripeFreq = 40.0;
                             float stripeSpeed = 1.0;
-                            // Simple scanline logic without heavy rim lighting
                             float stripes = sin((vUv.y * stripeFreq) - (uTime * stripeSpeed));
-                            
-                            // Create sharp bands
                             float stripeMask = smoothstep(0.2, 0.3, stripes);
-                            
-                            // Fade scanlines out towards the top of the sun
                             float scanlineFade = smoothstep(0.7, 0.3, vUv.y); 
-                            
-                            // Apply dark bands (scanlines)
                             vec3 finalColor = mix(color, color * 0.1, (1.0 - stripeMask) * scanlineFade);
-
                             gl_FragColor = vec4(finalColor, 1.0);
                         }
                     `}
@@ -209,24 +212,29 @@ const RetroSun: React.FC = () => {
     );
 };
 
-const MovingGrid: React.FC = () => {
-    const { speed, isManualSlowMotion, status } = useStore();
+const MovingGrid: React.FC<{ color: string }> = ({ color }) => {
+    const { speed, isManualSlowMotion, status, getCurrentTheme } = useStore();
     const meshRef = useRef<THREE.Mesh>(null);
     const offsetRef = useRef(0);
+    const matRef = useRef<THREE.MeshBasicMaterial>(null);
     
     useFrame((state, delta) => {
-        if (status === GameStatus.PAUSED) return; // Freeze on Pause
+        if (status === GameStatus.PAUSED) return;
+
+        const themeID = getCurrentTheme();
+        const config = THEME_CONFIG[themeID];
+
+        // Instant Color Update
+        if (matRef.current) {
+            matRef.current.color.set(config.grid);
+        }
 
         if (meshRef.current) {
              let activeSpeed = speed > 0 ? speed : 5;
              if (isManualSlowMotion) activeSpeed *= 0.3;
 
              offsetRef.current += activeSpeed * delta;
-             
-             // Grid cell size = 400 (length) / 40 (segments) = 10 units
              const cellSize = 10;
-             
-             // Move mesh forward (+Z) to simulate travel, then snap back
              const zPos = -100 + (offsetRef.current % cellSize);
              meshRef.current.position.z = zPos;
         }
@@ -236,30 +244,50 @@ const MovingGrid: React.FC = () => {
         <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.2, -100]}>
             <planeGeometry args={[300, 400, 30, 40]} />
             <meshBasicMaterial 
-                color="#8800ff" 
+                ref={matRef}
+                color={color} 
                 wireframe 
                 transparent 
-                opacity={0.15} 
+                opacity={0.25} 
             />
         </mesh>
     );
 };
 
+const ThemeController = () => {
+    const { getCurrentTheme } = useStore();
+    const { scene } = useThree();
+    const themeID = getCurrentTheme();
+    const config = THEME_CONFIG[themeID];
+
+    useFrame(() => {
+        const t = THEME_CONFIG[getCurrentTheme()];
+        
+        // Instant Update
+        scene.background = new THREE.Color(t.background);
+        scene.fog = new THREE.Fog(t.fog, 40, 160);
+    });
+
+    return (
+        <>
+            <ambientLight color={config.lightAmbient} intensity={0.3} />
+            <directionalLight position={[0, 20, -10]} intensity={1.5} color={config.lightDir} />
+            <pointLight position={[0, 25, -150]} intensity={2} color={config.lightPoint} distance={200} decay={2} />
+            
+            <MovingGrid color={config.grid} />
+            <RetroSun sunTop={config.sunTop} sunBottom={config.sunBottom} />
+        </>
+    );
+}
+
 export const Environment: React.FC = () => {
   return (
     <>
-      <color attach="background" args={['#050011']} />
-      <fog attach="fog" args={['#050011', 40, 160]} />
-      
-      <ambientLight intensity={0.2} color="#400080" />
-      <directionalLight position={[0, 20, -10]} intensity={1.5} color="#00ffff" />
-      <pointLight position={[0, 25, -150]} intensity={2} color="#ff00aa" distance={200} decay={2} />
+      {/* Theme Controller handles Lights, Fog, Background, Grid, Sun */}
+      <ThemeController />
       
       <StarField />
-      <MovingGrid />
       <LaneGuides />
-      
-      <RetroSun />
     </>
   );
 };

@@ -6,7 +6,7 @@
 
 
 import { create } from 'zustand';
-import { GameStatus, RUN_SPEED_BASE, VocabItem, WrongAnswer, Difficulty, PetID } from './types';
+import { GameStatus, RUN_SPEED_BASE, VocabItem, WrongAnswer, Difficulty, PetID, ThemeID } from './types';
 
 // IDs format: PUBLISHER_GRADE_LESSON (e.g., KX_1_1, HL_3_12)
 export const LESSON_DATA: Record<string, VocabItem[]> = {
@@ -52,12 +52,8 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '朵', question: '花( )ㄉㄨㄛ˙' }, { char: '從', question: '( )ㄘㄨㄥˊ 前' }, { char: '頭', question: '( )ㄊㄡˊ 髮' }, 
         { char: '那', question: '( )ㄋㄚˋ 裡' }
     ],
-
-    // =========================================================================
-    // 康軒 (Kangxuan) - Grade 2
-    // =========================================================================
     'KX_2_1': [
-        { char: '年', question: '新( )ㄋㄧㄢˊ' }, { char: '希', question: '( )ㄒㄧ 望' }, { char: '望', question: '願( )ㄨㄤˋ' }, { char: '坐', question: '( )ㄗㄨㄛˋ 下' },
+        { char: '年', question: '新( )ㄋㄧㄢˊ' }, { char: '希', question: '( )ㄒㄧ 望' }, { char: '望', question: '願( )ㄨㄤˋ' }, { char: '坐', question: '( )ㄗㄨㄛˇ 下' },
         { char: '位', question: '座( )ㄨㄟˋ' }, { char: '本', question: '課( )ㄅㄣˇ' }, { char: '淡', question: '平( )ㄉㄢˋ' }, { char: '書', question: '讀( )ㄕㄨ' },
         { char: '老', question: '( )ㄌㄠˇ 師' }, { char: '師', question: '老( )ㄕ' }, { char: '以', question: '所( )ㄧˇ' }, { char: '為', question: '因( )ㄨㄟˋ' },
         { char: '故', question: '( )ㄍㄨˋ 事' }, { char: '用', question: '( )ㄩㄥˋ 功' }, { char: '力', question: '用( )ㄌㄧˋ' }, { char: '只', question: '( )ㄓˇ 是' },
@@ -660,7 +656,7 @@ interface GameState {
   
   // --- SETTINGS ---
   difficulty: Difficulty;
-  victoryTarget: number;
+  victoryTarget: number; // 0 means unlimited
   maxSpeedSetting: number; // 100, 150, 0
   startingLivesSetting: number; // 3, 5, 8
   ttsEnabled: boolean;
@@ -687,10 +683,12 @@ interface GameState {
   hasGemDoubler: boolean;
   hasMagnet: boolean;
 
-  // --- PETS ---
+  // --- THEMES & PETS ---
   ownedPets: PetID[];
   activePets: PetID[]; 
   lastPetActionTime: number;
+  ownedThemes: ThemeID[];
+  currentThemeIndex: number; // NEW: Track theme cycle index
 
   // --- GAMEPLAY ---
   currentVocab: VocabItem | null;
@@ -707,7 +705,7 @@ interface GameState {
   registerIgnore: () => void;
   setDistance: (dist: number) => void;
   activateImmortality: () => void;
-  buyItem: (itemId: string, cost: number, petId?: PetID) => void;
+  buyItem: (itemId: string, cost: number, petId?: PetID, themeId?: ThemeID) => void;
   openShop: () => void;
   closeShop: () => void;
   setManualSlowMotion: (active: boolean) => void;
@@ -726,6 +724,8 @@ interface GameState {
   updatePetActionTime: () => void;
   setTtsEnabled: (enabled: boolean) => void;
   toggleDevMode: () => void;
+  getCurrentTheme: () => ThemeID;
+  setSpeed: (speed: number) => void;
 }
 
 export const useStore = create<GameState>((set, get) => ({
@@ -768,10 +768,12 @@ export const useStore = create<GameState>((set, get) => ({
   hasGemDoubler: false,
   hasMagnet: false,
 
-  // Pets
+  // Pets & Themes
   ownedPets: [],
   activePets: [],
   lastPetActionTime: 0,
+  ownedThemes: [ThemeID.SYNTHWAVE], // Default theme
+  currentThemeIndex: 0,
 
   currentVocab: null,
   isManualSlowMotion: false,
@@ -783,6 +785,17 @@ export const useStore = create<GameState>((set, get) => ({
   setMaxSpeed: (val) => set({ maxSpeedSetting: val }),
   setStartingLives: (val) => set({ startingLivesSetting: val }),
   setTtsEnabled: (enabled) => set({ ttsEnabled: enabled }),
+  setSpeed: (speed) => set({ speed }),
+
+  getCurrentTheme: () => {
+      const { ownedThemes, currentThemeIndex } = get();
+      const fullOrder = [ThemeID.SYNTHWAVE, ThemeID.INFERNO, ThemeID.GLACIER, ThemeID.TOXIC];
+      const availableRotation = fullOrder.filter(t => ownedThemes.includes(t));
+      
+      if (availableRotation.length === 0) return ThemeID.SYNTHWAVE;
+
+      return availableRotation[currentThemeIndex % availableRotation.length];
+  },
 
   toggleDevMode: () => {
       const currentMode = get().devMode;
@@ -790,7 +803,7 @@ export const useStore = create<GameState>((set, get) => ({
           // Enable Dev Mode: Unlock everything
           set({ 
               devMode: true,
-              score: 999999,
+              score: 80000,
               hasDoubleJump: true,
               hasImmortality: true,
               hasFireball: true,
@@ -798,7 +811,8 @@ export const useStore = create<GameState>((set, get) => ({
               hasPassiveHeal: true,
               hasGemDoubler: true,
               hasMagnet: true,
-              ownedPets: [PetID.MARIO, PetID.PIKACHU, PetID.MECHA]
+              ownedPets: [PetID.MARIO, PetID.PIKACHU, PetID.MECHA],
+              ownedThemes: [ThemeID.SYNTHWAVE, ThemeID.INFERNO, ThemeID.GLACIER, ThemeID.TOXIC]
           });
       } else {
           // Disable Dev Mode: Reset everything to fresh state
@@ -814,8 +828,10 @@ export const useStore = create<GameState>((set, get) => ({
               hasMagnet: false,
               ownedPets: [],
               activePets: [],
+              ownedThemes: [ThemeID.SYNTHWAVE],
               lives: get().startingLivesSetting,
-              maxLives: get().startingLivesSetting
+              maxLives: get().startingLivesSetting,
+              currentThemeIndex: 0
           });
       }
   },
@@ -835,7 +851,9 @@ export const useStore = create<GameState>((set, get) => ({
                   hasGemDoubler: data.hasGemDoubler || false,
                   hasMagnet: data.hasMagnet || false,
                   ownedPets: data.ownedPets || [],
-                  activePets: data.activePets || [] 
+                  activePets: data.activePets || [],
+                  ownedThemes: data.ownedThemes && data.ownedThemes.length > 0 ? data.ownedThemes : [ThemeID.SYNTHWAVE],
+                  // We can optionally load currentThemeIndex, but resetting it usually feels better for a new session unless specified.
               });
           } catch (e) {
               console.error("Failed to load save", e);
@@ -865,10 +883,8 @@ export const useStore = create<GameState>((set, get) => ({
           }
       });
       
-      // Fallback if empty - but UI prevents this now
+      // Fallback if empty
       if (pool.length === 0) {
-          // Safe fallback to prevent crash if somehow bypassed
-          // We'll try to find ANY key
           const anyKey = Object.keys(LESSON_DATA)[0];
           if (anyKey) pool = LESSON_DATA[anyKey];
           else pool = [{char: '無', question: '無題庫'}];
@@ -895,7 +911,8 @@ export const useStore = create<GameState>((set, get) => ({
           totalCorrectAnswers: 0,
           consecutiveIgnores: 0,
           wrongAnswers: [],
-          correctCountForHeal: 0
+          correctCountForHeal: 0,
+          currentThemeIndex: 0 // Reset theme on start
       });
   },
 
@@ -937,7 +954,8 @@ export const useStore = create<GameState>((set, get) => ({
                   hasGemDoubler: get().hasGemDoubler,
                   hasMagnet: get().hasMagnet,
                   ownedPets: get().ownedPets,
-                  activePets: get().activePets
+                  activePets: get().activePets,
+                  ownedThemes: get().ownedThemes
               }));
           }
           set({ status: GameStatus.GAME_OVER, highScore: Math.max(score, highScore) });
@@ -954,8 +972,6 @@ export const useStore = create<GameState>((set, get) => ({
       if (isMarioBonus) {
           multiplier *= 2; // Another 2x
       }
-      // Total could be 1x, 2x, or 4x
-
       set((state) => ({ score: state.score + (amount * multiplier) }));
   },
 
@@ -1004,15 +1020,14 @@ export const useStore = create<GameState>((set, get) => ({
 
           const newTotal = totalCorrectAnswers + 1;
           
-          // Check Victory Condition
-          if (newTotal >= victoryTarget) {
-             set({ status: GameStatus.VICTORY, totalCorrectAnswers: newTotal, score: score + 5000 }); // Bonus for winning
+          // Check Victory Condition (0 means Infinite)
+          if (victoryTarget > 0 && newTotal >= victoryTarget) {
+             set({ status: GameStatus.VICTORY, totalCorrectAnswers: newTotal, score: score + 5000 });
              return true;
           }
           
           // Speed Up Logic (Respect Max Speed Setting)
           let newSpeed = get().speed + 1.5;
-          // maxSpeedSetting is a percentage of base (100 = 1.0x, 150 = 1.5x, 0 = infinite)
           if (maxSpeedSetting > 0) {
               const maxAllowed = RUN_SPEED_BASE * (maxSpeedSetting / 100);
               if (newSpeed > maxAllowed) newSpeed = maxAllowed;
@@ -1020,19 +1035,18 @@ export const useStore = create<GameState>((set, get) => ({
 
           // Level Up Logic (every 5 correct)
           const newLevel = Math.floor(newTotal / 5) + 1;
+          // Lane scaling caps at 9 lanes
           const newLaneCount = Math.min(9, 3 + Math.floor((newLevel - 1) / 2) * 2);
 
           // Pick new vocab
           let pool: VocabItem[] = [];
           selectedLessonIds.forEach(id => { if (LESSON_DATA[id]) pool = pool.concat(LESSON_DATA[id]); });
-          // Fallback if pool empty logic handled
           if (pool.length === 0) {
               const anyKey = Object.keys(LESSON_DATA)[0];
               if (anyKey) pool = LESSON_DATA[anyKey];
               else pool = [{char: '無', question: '無題庫'}];
           }
           
-          // Simple weighting: Try not to repeat immediately
           let nextVocab = pool[Math.floor(Math.random() * pool.length)];
           while(pool.length > 1 && nextVocab === currentVocab) {
              nextVocab = pool[Math.floor(Math.random() * pool.length)];
@@ -1054,17 +1068,13 @@ export const useStore = create<GameState>((set, get) => ({
               totalCorrectAnswers: newTotal,
               lives: newLives,
               correctCountForHeal: newHealCount,
-              consecutiveIgnores: 0, // Reset hint counter
-              // Grant invincibility immediately on level up (running towards shop)
-              // It will be cleared 3s after the shop closes
+              consecutiveIgnores: 0,
               isImmortalityActive: isLevelUp ? true : get().isImmortalityActive
           });
           return true;
       } else {
           // Wrong
           const isMechaEquipped = activePets.includes(PetID.MECHA);
-          
-          // If Mecha is equipped, we SKIP taking damage
           if (!isMechaEquipped) {
               get().takeDamage();
           }
@@ -1091,7 +1101,6 @@ export const useStore = create<GameState>((set, get) => ({
   openShop: () => set({ status: GameStatus.SHOP, isImmortalityActive: true }),
   
   closeShop: () => {
-      // Save when leaving shop
        localStorage.setItem('gemini_runner_save', JSON.stringify({
           highScore: get().highScore,
           hasDoubleJump: get().hasDoubleJump,
@@ -1102,15 +1111,20 @@ export const useStore = create<GameState>((set, get) => ({
           hasGemDoubler: get().hasGemDoubler,
           hasMagnet: get().hasMagnet,
           ownedPets: get().ownedPets,
-          activePets: get().activePets
+          activePets: get().activePets,
+          ownedThemes: get().ownedThemes
       }));
-      set({ status: GameStatus.PLAYING, isImmortalityActive: true });
+      set((state) => ({ 
+          status: GameStatus.PLAYING, 
+          isImmortalityActive: true,
+          currentThemeIndex: state.currentThemeIndex + 1 // Switch theme on exit
+      }));
       setTimeout(() => {
         set({ isImmortalityActive: false });
       }, 3000);
   },
 
-  buyItem: (itemId, cost, petId) => {
+  buyItem: (itemId, cost, petId, themeId) => {
       const { score } = get();
       if (score >= cost) {
           const updates: any = { score: score - cost };
@@ -1119,8 +1133,12 @@ export const useStore = create<GameState>((set, get) => ({
               const currentOwned = get().ownedPets;
               if (!currentOwned.includes(petId)) {
                   updates.ownedPets = [...currentOwned, petId];
-                  // Auto equip on buy
                   updates.activePets = [...get().activePets, petId];
+              }
+          } else if (themeId) {
+              const currentThemes = get().ownedThemes;
+              if (!currentThemes.includes(themeId)) {
+                  updates.ownedThemes = [...currentThemes, themeId];
               }
           } else {
             switch (itemId) {
@@ -1158,7 +1176,6 @@ export const useStore = create<GameState>((set, get) => ({
   updatePetActionTime: () => set({ lastPetActionTime: Date.now() }),
 
   getRandomDistractor: () => {
-      // Get a random char from ALL loaded lessons to be a distractor
       const allKeys = Object.keys(LESSON_DATA);
       const randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
       const lesson = LESSON_DATA[randomKey];

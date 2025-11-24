@@ -1,5 +1,4 @@
 
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -38,15 +37,15 @@ const Pet: React.FC<{ type: PetID }> = ({ type }) => {
 
     // Materials
     const marioMats = useMemo(() => ({
-        hat: new THREE.MeshStandardMaterial({ color: '#ff0000' }),
+        hat: new THREE.MeshStandardMaterial({ color: '#ff2222', emissive: '#aa0000', emissiveIntensity: 0.6 }),
         face: new THREE.MeshStandardMaterial({ color: '#ffccaa' }),
-        shirt: new THREE.MeshStandardMaterial({ color: '#ff0000' }),
-        overalls: new THREE.MeshStandardMaterial({ color: '#0000ff' }),
+        shirt: new THREE.MeshStandardMaterial({ color: '#ff2222', emissive: '#aa0000', emissiveIntensity: 0.6 }), // Vivid Red
+        overalls: new THREE.MeshStandardMaterial({ color: '#0055ff', emissive: '#0022aa', emissiveIntensity: 0.6 }), // Vivid Blue
         shoes: new THREE.MeshStandardMaterial({ color: '#442200' }),
     }), []);
 
     const pikaMats = useMemo(() => ({
-        body: new THREE.MeshStandardMaterial({ color: '#ffe600' }),
+        body: new THREE.MeshStandardMaterial({ color: '#ffcc00', emissive: '#ffaa00', emissiveIntensity: 0.8 }), // Golden Yellow
         cheeks: new THREE.MeshBasicMaterial({ color: '#ff0000' }),
         tips: new THREE.MeshBasicMaterial({ color: '#000000' }),
     }), []);

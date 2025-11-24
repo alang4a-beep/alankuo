@@ -1,5 +1,4 @@
 
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -242,7 +241,8 @@ export const LevelManager: React.FC = () => {
             active: true,
         });
         
-        nextSpawnDistance.current = distanceTraveled.current + 80;
+        // Scale shop spawn distance logic so it's not too abrupt
+        nextSpawnDistance.current = distanceTraveled.current + Math.max(80, speed * 1.5);
         setRenderTrigger(t => t + 1);
         
     } else if (status === GameStatus.GAME_OVER || status === GameStatus.VICTORY) {
@@ -251,7 +251,7 @@ export const LevelManager: React.FC = () => {
     
     prevStatus.current = status;
     prevLevel.current = level;
-  }, [status, level, setDistance]);
+  }, [status, level, setDistance, speed]);
 
   useEffect(() => {
     const handleShoot = (e: CustomEvent) => {
@@ -318,7 +318,7 @@ export const LevelManager: React.FC = () => {
                 active: true,
                 color: '#ffe600'
             });
-            audio.playJump(false); // Reuse sound or add new
+            audio.playJump(false); 
             hasChanges = true;
         }
     }
@@ -524,10 +524,16 @@ export const LevelManager: React.FC = () => {
         furthestZ = Math.min(...staticObjects.map(o => o.position[2]));
     }
 
-    if (furthestZ > -SPAWN_DISTANCE) {
-         const minGap = Math.min(12 + (speed * 0.4), 45); 
+    // Scale spawn visibility distance with speed (look ahead)
+    // Base 120, but at speed 300 we need ~360 to see 1.2s ahead
+    const dynamicSpawnDistance = Math.max(SPAWN_DISTANCE, speed * 1.2);
+
+    if (furthestZ > -dynamicSpawnDistance) {
+         // Increase gap at high speeds to prevent overlap visual chaos
+         // At 300 speed, gap ~ 120 units (0.4s)
+         const minGap = Math.max(15, speed * 0.4); 
          
-         const spawnZ = Math.min(furthestZ - minGap, -SPAWN_DISTANCE);
+         const spawnZ = Math.min(furthestZ - minGap, -dynamicSpawnDistance);
          
          const isQuestionDue = distanceTraveled.current >= nextSpawnDistance.current;
 
@@ -545,7 +551,11 @@ export const LevelManager: React.FC = () => {
                 value: val,
                 isTarget: isTarget
              });
-             nextSpawnDistance.current = distanceTraveled.current + 40; 
+             
+             // Scale interval: maintain roughly 2 seconds between questions regardless of speed
+             // At speed 22.5 -> ~45 units. At speed 300 -> ~600 units.
+             const nextInterval = Math.max(40, speed * 2.0);
+             nextSpawnDistance.current = distanceTraveled.current + nextInterval; 
              hasChanges = true;
 
          } else if (Math.random() > 0.1) { 
@@ -593,7 +603,6 @@ export const LevelManager: React.FC = () => {
                         const patternType = Math.random();
 
                         // Pattern 1: Funnel / Single Path (Most Dangerous)
-                        // Blocks ALL lanes except one. Player must be in that lane.
                         if (patternType < 0.4) {
                             const safeLaneIndex = Math.floor(Math.random() * allLanes.length);
                             allLanes.forEach((laneIdx, idx) => {
@@ -610,11 +619,9 @@ export const LevelManager: React.FC = () => {
                             });
                         } 
                         // Pattern 2: Multi-Tower (Side-by-side or Split)
-                        // Spawns 2 towers (or 1 if narrow).
                         else {
-                             // Shuffle lanes to pick random spots
                              allLanes.sort(() => Math.random() - 0.5);
-                             const countToSpawn = Math.min(2, allLanes.length); // Spawn up to 2
+                             const countToSpawn = Math.min(2, allLanes.length); 
 
                              for(let k = 0; k < countToSpawn; k++) {
                                  keptObjects.push({

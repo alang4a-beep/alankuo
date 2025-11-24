@@ -1,5 +1,4 @@
 
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -39,6 +38,70 @@ export enum PetID {
   PIKACHU = 'PIKACHU', // Shoots lightning
   MECHA = 'MECHA' // Prevents damage from wrong answers
 }
+
+export enum ThemeID {
+  SYNTHWAVE = 'THEME_SYNTHWAVE',
+  INFERNO = 'THEME_INFERNO',
+  GLACIER = 'THEME_GLACIER',
+  TOXIC = 'THEME_TOXIC'
+}
+
+export const THEME_CONFIG: Record<ThemeID, {
+    background: string;
+    fog: string;
+    grid: string;
+    floor: string; // New distinct floor color
+    sunTop: string;
+    sunBottom: string;
+    lightDir: string;
+    lightAmbient: string;
+    lightPoint: string;
+}> = {
+    [ThemeID.SYNTHWAVE]: {
+        background: '#050011', // Very dark blue/black
+        fog: '#050011',
+        grid: '#d500f9',       // Bright neon purple grid
+        floor: '#120024',      // Solid dark purple floor (Contrast against bg)
+        sunTop: '#ffe600',
+        sunBottom: '#ff0077',
+        lightDir: '#00ffff',
+        lightAmbient: '#400080',
+        lightPoint: '#ff00aa'
+    },
+    [ThemeID.INFERNO]: {
+        background: '#1a0000', // Pitch black/red
+        fog: '#1a0000',
+        grid: '#ff9100',       // Bright Orange grid
+        floor: '#3d0000',      // Dark solidified lava floor
+        sunTop: '#ffff00', 
+        sunBottom: '#ff0000', 
+        lightDir: '#ffaa00', 
+        lightAmbient: '#400000',
+        lightPoint: '#ff5500'
+    },
+    [ThemeID.GLACIER]: {
+        background: '#000814', // Darkest Navy
+        fog: '#000814',
+        grid: '#00ffff',       // Cyan grid
+        floor: '#001e3d',      // Deep blue ice floor
+        sunTop: '#ffffff', 
+        sunBottom: '#0088ff', 
+        lightDir: '#ffffff',
+        lightAmbient: '#002244',
+        lightPoint: '#00ffff'
+    },
+    [ThemeID.TOXIC]: {
+        background: '#050a00', // Darkest Green/Black
+        fog: '#050a00',
+        grid: '#39ff14',       // Neon Green grid
+        floor: '#0f2900',      // Dark slime floor
+        sunTop: '#ccff00', 
+        sunBottom: '#004400', 
+        lightDir: '#adff2f', 
+        lightAmbient: '#003300',
+        lightPoint: '#00ff00'
+    }
+};
 
 export interface VocabItem {
     char: string;
@@ -90,6 +153,7 @@ export interface ShopItem {
     icon: any; // Lucide icon component
     oneTime?: boolean; // If true, remove from pool after buying
     petId?: PetID; // If this item unlocks a pet
+    themeId?: ThemeID; // If this item unlocks a theme
 }
 
 // Global JSX Augmentation for React Three Fiber
