@@ -1,4 +1,5 @@
 
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -9,6 +10,7 @@ import React from 'react';
 export enum GameStatus {
   MENU = 'MENU',
   PLAYING = 'PLAYING',
+  PAUSED = 'PAUSED',
   SHOP = 'SHOP',
   GAME_OVER = 'GAME_OVER',
   VICTORY = 'VICTORY'
@@ -26,6 +28,7 @@ export enum ObjectType {
 }
 
 export enum Difficulty {
+  SUPER_SIMPLE = 'SUPER_SIMPLE', // No damage
   SIMPLE = 'SIMPLE',
   COMPLEX = 'COMPLEX'
 }

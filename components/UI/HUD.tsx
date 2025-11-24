@@ -1,4 +1,9 @@
 
+
+
+
+
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -6,7 +11,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal } from 'lucide-react';
+import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal, Baby, PauseCircle, Home, RotateCcw } from 'lucide-react';
 import { useStore } from '../../store';
 import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty, PetID } from '../../types';
 import { audio } from '../System/Audio';
@@ -206,6 +211,7 @@ const ShopScreen: React.FC = () => {
     );
 };
 
+// ... [WrongAnswerReview, MobileControls remain same] ...
 const WrongAnswerReview: React.FC = () => {
     const { wrongAnswers } = useStore();
     if (wrongAnswers.length === 0) return null;
@@ -237,7 +243,6 @@ const WrongAnswerReview: React.FC = () => {
     );
 }
 
-// --- New Mobile Virtual Controls ---
 const MobileControls: React.FC = () => {
     const { 
         setManualSlowMotion, 
@@ -246,14 +251,13 @@ const MobileControls: React.FC = () => {
         hasImmortality
     } = useStore();
     
-    // Status Calculation helpers
     const [fireballCooldown, setFireballCooldown] = useState(0);
     const [flightCooldown, setFlightCooldown] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
             const now = Date.now();
-            if (hasFireball) setFireballCooldown(Math.max(0, 1000 - (now - lastFireballTime))); // 1 sec cooldown
+            if (hasFireball) setFireballCooldown(Math.max(0, 1000 - (now - lastFireballTime)));
             if (hasFlight) {
                 if (!isFlying) setFlightCooldown(Math.max(0, 20000 - (now - lastFlightEndTime)));
                 else setFlightCooldown(0);
@@ -268,7 +272,7 @@ const MobileControls: React.FC = () => {
             style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
         >
             <div className="flex justify-between items-end w-full">
-                {/* Left: Slow Motion Button (Hold) */}
+                {/* Left: Slow Motion Button */}
                 <div className="pointer-events-auto">
                     <button
                         className="w-20 h-20 rounded-full bg-yellow-600/40 border-2 border-yellow-400/60 flex items-center justify-center active:scale-95 active:bg-yellow-500/60 transition-all backdrop-blur-sm shadow-lg"
@@ -332,22 +336,59 @@ const MobileControls: React.FC = () => {
     );
 }
 
+// --- Pause Screen ---
+const PauseScreen: React.FC = () => {
+    const { setStatus, restartGame, returnToMenu } = useStore();
+    return (
+        <div className="absolute inset-0 bg-black/60 z-[100] text-white pointer-events-auto backdrop-blur-sm flex items-center justify-center">
+             <div className="bg-gray-900/90 p-8 rounded-2xl border border-cyan-500/50 shadow-[0_0_40px_rgba(0,255,255,0.2)] flex flex-col items-center w-full max-w-sm">
+                 <h2 className="text-4xl font-black text-white mb-8 font-cyber tracking-widest flex items-center">
+                     <PauseCircle className="w-10 h-10 mr-3 text-cyan-400" /> 暫停
+                 </h2>
+                 
+                 <button 
+                    onClick={() => setStatus(GameStatus.PLAYING)}
+                    className="w-full mb-4 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl font-bold text-xl hover:scale-105 transition-transform flex items-center justify-center shadow-lg"
+                 >
+                     <Play className="w-6 h-6 mr-2 fill-white" /> 繼續遊戲
+                 </button>
+
+                 <button 
+                    onClick={() => { audio.init(); restartGame(); }}
+                    className="w-full mb-4 py-4 bg-gray-700 rounded-xl font-bold text-xl text-gray-200 hover:bg-gray-600 hover:text-white transition-colors flex items-center justify-center"
+                 >
+                     <RotateCcw className="w-6 h-6 mr-2" /> 重新開始
+                 </button>
+
+                 <button 
+                    onClick={() => returnToMenu()}
+                    className="w-full py-4 bg-red-900/50 border border-red-500/30 rounded-xl font-bold text-xl text-red-200 hover:bg-red-900/80 transition-colors flex items-center justify-center"
+                 >
+                     <Home className="w-6 h-6 mr-2" /> 返回主畫面
+                 </button>
+             </div>
+        </div>
+    );
+};
+
 export const HUD: React.FC = () => {
   const { 
-    score, lives, maxLives, status, restartGame, startGame, 
+    score, lives, maxLives, status, setStatus, restartGame, startGame, 
     distance, isImmortalityActive, speed, currentVocab, totalCorrectAnswers, 
     isManualSlowMotion, toggleLesson, selectedLessonIds, 
     victoryTarget, setVictoryTarget, highScore, consecutiveIgnores,
     startingLivesSetting, setStartingLives, maxSpeedSetting, setMaxSpeed,
     difficulty, setDifficulty,
     ttsEnabled, setTtsEnabled,
-    devMode, toggleDevMode
+    devMode, toggleDevMode,
+    returnToMenu
   } = useStore();
 
   const [imageError, setImageError] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [activeTab, setActiveTab] = useState<'KX' | 'HL' | 'NY'>('HL'); 
-  
+  const [activeGrade, setActiveGrade] = useState<1 | 2 | 3>(1);
+
   useEffect(() => {
       const handleOnline = () => setIsOffline(false);
       const handleOffline = () => setIsOffline(true);
@@ -371,12 +412,19 @@ export const HUD: React.FC = () => {
   if (status === GameStatus.SHOP) {
       return <ShopScreen />;
   }
+  
+  if (status === GameStatus.PAUSED) {
+      return <PauseScreen />;
+  }
 
   if (status === GameStatus.MENU) {
+      // ... (Menu Content - Removed for brevity, identical to previous)
+      // I will copy-paste the menu content back to ensure no code loss, 
+      // but using "..." here in thought process.
+      const canStart = selectedLessonIds.length > 0;
+
       return (
           <div className="absolute inset-0 flex items-center justify-center z-[100] bg-black/80 backdrop-blur-sm p-4 pointer-events-auto overflow-y-auto">
-              
-              {/* Developer Mode Toggle - Fixed Screen Position */}
               <button
                 onClick={toggleDevMode}
                 className={`fixed top-4 right-4 z-[200] flex items-center px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
@@ -390,7 +438,6 @@ export const HUD: React.FC = () => {
               </button>
 
               <div className="relative w-full max-w-3xl rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,255,255,0.2)] border border-white/10 animate-in zoom-in-95 duration-500 my-4">
-                
                 <div className="relative w-full bg-gray-900 flex flex-col">
                      <div className="relative h-48 md:h-56 overflow-hidden bg-gray-900 shrink-0">
                         {!imageError ? (
@@ -415,14 +462,10 @@ export const HUD: React.FC = () => {
                      </div>
 
                      <div className="p-6 md:p-8 bg-gradient-to-b from-[#050011] to-gray-900">
-                        
-                        {/* --- Game Settings Section --- */}
                         <div className="mb-6 bg-gray-800/40 rounded-xl p-4 border border-gray-700">
                             <div className="flex items-center text-gray-300 font-bold mb-4">
                                 <Settings className="w-4 h-4 mr-2" /> 遊戲設定
                             </div>
-                            
-                            {/* TTS Toggle */}
                             <div className="flex flex-wrap gap-4 mb-4">
                                 <button
                                     onClick={() => setTtsEnabled(!ttsEnabled)}
@@ -437,7 +480,6 @@ export const HUD: React.FC = () => {
                                 </button>
                             </div>
 
-                            {/* Target Count */}
                             <div className="mb-4">
                                 <div className="text-sm text-gray-400 mb-2 flex items-center"><Target className="w-3 h-3 mr-1"/> 挑戰題數</div>
                                 <div className="flex gap-2">
@@ -458,7 +500,6 @@ export const HUD: React.FC = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                {/* Starting Lives */}
                                 <div>
                                     <div className="text-sm text-gray-400 mb-2 flex items-center"><Heart className="w-3 h-3 mr-1"/> 初始生命</div>
                                     <div className="flex gap-2">
@@ -477,8 +518,6 @@ export const HUD: React.FC = () => {
                                         ))}
                                     </div>
                                 </div>
-
-                                {/* Max Speed */}
                                 <div>
                                     <div className="text-sm text-gray-400 mb-2 flex items-center"><Zap className="w-3 h-3 mr-1"/> 最高速度</div>
                                     <div className="flex gap-2">
@@ -498,11 +537,20 @@ export const HUD: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Difficulty Selector */}
                             <div>
                                 <div className="text-sm text-gray-400 mb-2 flex items-center"><AlertTriangle className="w-3 h-3 mr-1"/> 障礙難度</div>
                                 <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setDifficulty(Difficulty.SUPER_SIMPLE)}
+                                        className={`flex-1 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center ${
+                                            difficulty === Difficulty.SUPER_SIMPLE
+                                            ? 'bg-blue-500 text-white shadow-lg ring-2 ring-blue-300' 
+                                            : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                        }`}
+                                    >
+                                        <Baby className="w-4 h-4 mr-1" />
+                                        超級簡單
+                                    </button>
                                     <button
                                         onClick={() => setDifficulty(Difficulty.SIMPLE)}
                                         className={`flex-1 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center ${
@@ -525,34 +573,43 @@ export const HUD: React.FC = () => {
                                     </button>
                                 </div>
                                 <div className="text-[10px] text-gray-500 mt-1 text-center">
-                                    {difficulty === Difficulty.COMPLEX ? "會出現需「二段跳」的高牆與需「跳躍/攻擊」的寬牆" : "僅出現標準障礙物"}
+                                    {difficulty === Difficulty.SUPER_SIMPLE ? "撞到障礙物不會扣血 (適合練習)" : difficulty === Difficulty.COMPLEX ? "會出現需「二段跳」的高牆與需「跳躍/攻擊」的寬牆" : "僅出現標準障礙物"}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Lesson Selector (Tabbed Interface) */}
                         <div className="mb-8">
                             <div className="flex items-center justify-center text-cyan-400 mb-4 font-bold text-lg">
                                 <BookOpen className="w-5 h-5 mr-2" /> 
                                 <span>題庫選擇 (可複選)</span>
                             </div>
-
-                            {/* Publisher Tabs */}
-                            <div className="flex space-x-2 mb-4">
+                            <div className="flex space-x-2 mb-2">
                                 <button onClick={() => setActiveTab('KX')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'KX' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>康軒</button>
                                 <button onClick={() => setActiveTab('HL')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'HL' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>翰林</button>
                                 <button onClick={() => setActiveTab('NY')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'NY' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>南一</button>
                             </div>
-
-                            {/* Lesson List Grid (1-12) */}
+                             <div className="flex space-x-2 mb-4 px-4">
+                                <button onClick={() => setActiveGrade(1)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 1 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>一年級</button>
+                                <button onClick={() => setActiveGrade(2)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 2 ? 'bg-purple-600 text-white ring-2 ring-purple-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>二年級</button>
+                                <button onClick={() => setActiveGrade(3)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 3 ? 'bg-orange-600 text-white ring-2 ring-orange-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>三年級</button>
+                            </div>
                             <div className="grid grid-cols-4 gap-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar bg-gray-800/30 p-3 rounded-b-lg">
                                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
-                                        const id = `${activeTab}_${num}`;
+                                        const id = `${activeTab}_${activeGrade}_${num}`; // e.g. KX_1_1
+                                        const isAvailable = !!LESSON_DATA[id];
                                         const isSelected = selectedLessonIds.includes(id);
                                         const vocabList = LESSON_DATA[id] || [];
                                         const previewText = vocabList.length > 0 
                                             ? vocabList.slice(0, 3).map(v => v.char).join('、') 
-                                            : '無預覽';
+                                            : '無內容';
+
+                                        if (!isAvailable) {
+                                            return (
+                                                 <div key={id} className="aspect-square rounded-lg border border-gray-800 bg-gray-900/30 flex items-center justify-center opacity-50">
+                                                     <span className="text-gray-700 font-bold text-lg">{num}</span>
+                                                 </div>
+                                            )
+                                        }
 
                                         return (
                                             <button
@@ -564,8 +621,6 @@ export const HUD: React.FC = () => {
                                             >
                                                 <span className={`text-2xl md:text-3xl font-black mb-1 ${isSelected ? 'text-cyan-400' : 'text-gray-500'}`}>{num}</span>
                                                 {isSelected && <div className="absolute top-1 right-1 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]"></div>}
-                                                
-                                                {/* Hover Tooltip for Content Preview */}
                                                 <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-[10px] text-gray-300 py-1 px-1 text-center opacity-0 group-hover:opacity-100 transition-opacity truncate rounded-b-lg">
                                                     {previewText}...
                                                 </div>
@@ -579,12 +634,22 @@ export const HUD: React.FC = () => {
                         </div>
 
                         <button 
-                          onClick={() => { audio.init(); startGame(); }}
-                          className="w-full group relative px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white font-black text-xl rounded-xl hover:bg-white/20 transition-all shadow-[0_0_20px_rgba(0,255,255,0.2)] hover:shadow-[0_0_30px_rgba(0,255,255,0.4)] hover:border-cyan-400 overflow-hidden"
+                          onClick={() => { 
+                              if (canStart) {
+                                audio.init(); 
+                                startGame(); 
+                              }
+                          }}
+                          disabled={!canStart}
+                          className={`w-full group relative px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white font-black text-xl rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,255,0.2)] overflow-hidden ${!canStart ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:bg-white/20 hover:shadow-[0_0_30px_rgba(0,255,255,0.4)] hover:border-cyan-400'}`}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/40 via-purple-500/40 to-pink-500/40 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                            {canStart && <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/40 via-purple-500/40 to-pink-500/40 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>}
                             <span className="relative z-10 tracking-widest flex items-center justify-center">
-                                開始遊戲 <Play className="ml-2 w-5 h-5 fill-white" />
+                                {canStart ? (
+                                    <>開始遊戲 <Play className="ml-2 w-5 h-5 fill-white" /></>
+                                ) : (
+                                    <>請先選擇題庫</>
+                                )}
                             </span>
                         </button>
                         
@@ -600,10 +665,9 @@ export const HUD: React.FC = () => {
       );
   }
 
-  // ... (Game Over and Victory Screens remain similar)
-
+  // ... (Game Over and Victory Screens - No Changes needed, omitting for brevity but assume they are here)
   if (status === GameStatus.GAME_OVER) {
-      return (
+       return (
           <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-sm overflow-y-auto custom-scrollbar">
               <div className="flex flex-col items-center justify-start min-h-full py-12 px-4">
                 <h1 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-[0_0_10px_rgba(255,0,0,0.8)] font-cyber text-center">遊戲結束</h1>
@@ -626,6 +690,13 @@ export const HUD: React.FC = () => {
                     再試一次
                 </button>
                 
+                <button 
+                    onClick={() => returnToMenu()}
+                    className="mt-4 px-6 py-3 bg-gray-800 text-gray-300 font-bold rounded-lg hover:bg-gray-700 hover:text-white transition-colors"
+                >
+                    回主選單
+                </button>
+
                 <WrongAnswerReview />
               </div>
           </div>
@@ -656,6 +727,13 @@ export const HUD: React.FC = () => {
                     重新挑戰
                 </button>
 
+                <button 
+                    onClick={() => returnToMenu()}
+                    className="mt-4 px-6 py-3 bg-gray-800 text-gray-300 font-bold rounded-lg hover:bg-gray-700 hover:text-white transition-colors"
+                >
+                    回主選單
+                </button>
+
                 <WrongAnswerReview />
             </div>
         </div>
@@ -666,12 +744,24 @@ export const HUD: React.FC = () => {
     <div className={containerClass}>
         {/* Top Bar */}
         <div className="flex justify-between items-start w-full">
-            <div className="flex flex-col">
-                <div className="text-3xl md:text-5xl font-bold text-cyan-400 drop-shadow-[0_0_10px_#00ffff] font-cyber">
-                    {score.toLocaleString()}
+            {/* Left Side: Score & Pause */}
+            <div className="flex flex-col items-start">
+                <div className="flex items-center">
+                     {/* PAUSE BUTTON */}
+                     <button 
+                        onClick={() => setStatus(GameStatus.PAUSED)}
+                        className="pointer-events-auto mr-4 p-2 rounded-full bg-gray-800/50 hover:bg-gray-700/80 text-cyan-400 border border-cyan-500/30 transition-all"
+                     >
+                         <PauseCircle className="w-8 h-8 md:w-10 md:h-10" />
+                     </button>
+                     
+                     <div className="text-3xl md:text-5xl font-bold text-cyan-400 drop-shadow-[0_0_10px_#00ffff] font-cyber">
+                        {score.toLocaleString()}
+                    </div>
                 </div>
             </div>
             
+            {/* Right Side: Lives */}
             <div className="flex space-x-1 md:space-x-2">
                 {[...Array(maxLives)].map((_, i) => (
                     <Heart 
@@ -688,15 +778,13 @@ export const HUD: React.FC = () => {
                 答題進度: {totalCorrectAnswers} / {victoryTarget}
              </div>
              <div className="text-[10px] text-gray-400 mt-1">
-                 {selectedLessonIds.length > 1 ? `多重題庫 (${selectedLessonIds.length})` : LESSON_NAMES[selectedLessonIds[0]]}
+                 {selectedLessonIds.length > 1 ? `多重題庫 (${selectedLessonIds.length})` : selectedLessonIds.length === 1 ? LESSON_NAMES[selectedLessonIds[0]?.split('_')[0]] + ' ' + selectedLessonIds[0]?.split('_')[2] + '課' : '未選擇題庫'}
              </div>
         </div>
 
         {/* QUESTION DISPLAY */}
         {currentVocab && (
              <div className="absolute top-20 md:top-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in duration-300">
-                
-                {/* QUESTION BOX */}
                 <div className="bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-2xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.3)] min-w-[280px] md:min-w-[400px] text-center relative">
                      {/* TTS Button on Question Box */}
                      {ttsEnabled && (
@@ -708,7 +796,7 @@ export const HUD: React.FC = () => {
                                 window.speechSynthesis.cancel();
                                 window.speechSynthesis.speak(u);
                             }}
-                            className="absolute top-2 right-2 text-cyan-500 hover:text-white"
+                            className="absolute top-2 right-2 pointer-events-auto text-cyan-500 hover:text-white"
                          >
                              <Volume2 className="w-4 h-4" />
                          </button>
@@ -723,7 +811,6 @@ export const HUD: React.FC = () => {
                     </div>
                 </div>
                 
-                {/* HINT SYSTEM (MOVED BELOW QUESTION) */}
                 {consecutiveIgnores >= 3 && (
                     <div className="mt-4 animate-bounce flex flex-col items-center">
                         <div className="text-xs text-yellow-300 mb-1 font-bold tracking-widest">提示: 正解為</div>
@@ -759,7 +846,6 @@ export const HUD: React.FC = () => {
              </div>
         </div>
         
-        {/* Manual Slow Motion UI Hint */}
         {isManualSlowMotion && (
             <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 text-yellow-300 bg-yellow-900/40 px-4 py-1 rounded border border-yellow-500/30 pointer-events-none">
                 手動減速中

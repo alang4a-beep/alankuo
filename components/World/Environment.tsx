@@ -1,4 +1,6 @@
 
+
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -9,10 +11,10 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '../../store';
-import { LANE_WIDTH } from '../../types';
+import { LANE_WIDTH, GameStatus } from '../../types';
 
 const StarField: React.FC = () => {
-  const { speed, isManualSlowMotion } = useStore();
+  const { speed, isManualSlowMotion, status } = useStore();
   const count = 3000; // Increased star count for better density
   const meshRef = useRef<THREE.Points>(null);
   
@@ -41,6 +43,7 @@ const StarField: React.FC = () => {
 
   useFrame((state, delta) => {
     if (!meshRef.current) return;
+    if (status === GameStatus.PAUSED) return; // Freeze on Pause
     
     const positions = meshRef.current.geometry.attributes.position.array as Float32Array;
     let activeSpeed = speed > 0 ? speed : 2; // Always move slightly even when stopped
@@ -132,10 +135,13 @@ const LaneGuides: React.FC = () => {
 };
 
 const RetroSun: React.FC = () => {
+    const { status } = useStore();
     const matRef = useRef<THREE.ShaderMaterial>(null);
     const sunGroupRef = useRef<THREE.Group>(null);
 
     useFrame((state) => {
+        if (status === GameStatus.PAUSED) return; // Freeze on Pause
+
         if (matRef.current) {
             matRef.current.uniforms.uTime.value = state.clock.elapsedTime;
         }
@@ -204,11 +210,13 @@ const RetroSun: React.FC = () => {
 };
 
 const MovingGrid: React.FC = () => {
-    const { speed, isManualSlowMotion } = useStore();
+    const { speed, isManualSlowMotion, status } = useStore();
     const meshRef = useRef<THREE.Mesh>(null);
     const offsetRef = useRef(0);
     
     useFrame((state, delta) => {
+        if (status === GameStatus.PAUSED) return; // Freeze on Pause
+
         if (meshRef.current) {
              let activeSpeed = speed > 0 ? speed : 5;
              if (isManualSlowMotion) activeSpeed *= 0.3;
