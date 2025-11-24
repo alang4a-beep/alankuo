@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -149,6 +150,71 @@ export class AudioController {
     osc.stop(t + 0.3);
     noise.start(t);
     noise.stop(t + 0.3);
+  }
+
+  playProjectileHit() {
+    if (!this.ctx || !this.masterGain) this.init();
+    if (!this.ctx || !this.masterGain) return;
+
+    const t = this.ctx.currentTime;
+    
+    // "Peng" (碰) sound - Heavy impact with low-end thud
+    
+    // 1. Oscillator for the low "Boom/Thud" (Sine wave drops pitch fast)
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, t); // Start slightly higher for attack
+    osc.frequency.exponentialRampToValueAtTime(40, t + 0.15); // Drop deep quickly
+
+    const oscGain = this.ctx.createGain();
+    oscGain.gain.setValueAtTime(0.6, t);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+
+    // 2. Noise for the "Crack" / Impact texture
+    const bufferSize = this.ctx.sampleRate * 0.1;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1); 
+    }
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+    
+    // Lowpass filter to make the noise sound like a physical hit (muffled), not static
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, t);
+    filter.frequency.linearRampToValueAtTime(100, t + 0.1);
+
+    const noiseGain = this.ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.4, t); // Moderate volume
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+
+    // Connections
+    osc.connect(oscGain);
+    oscGain.connect(this.masterGain);
+    
+    noise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(this.masterGain);
+
+    osc.start(t);
+    osc.stop(t + 0.2);
+    noise.start(t);
+    noise.stop(t + 0.2);
+  }
+
+  speak(text: string) {
+    if (!('speechSynthesis' in window)) return;
+    
+    // Clean text: remove parentheses and fill-in blanks for better speech
+    const cleanText = text.replace(/\(\s*\)/g, '').replace(/\s+/g, '');
+    
+    const u = new SpeechSynthesisUtterance(cleanText);
+    u.lang = 'zh-TW';
+    u.rate = 0.9;
+    window.speechSynthesis.cancel(); // Stop previous
+    window.speechSynthesis.speak(u);
   }
 }
 

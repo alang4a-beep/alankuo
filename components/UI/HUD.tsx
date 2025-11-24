@@ -6,14 +6,57 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers } from 'lucide-react';
+import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal } from 'lucide-react';
 import { useStore } from '../../store';
-import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty } from '../../types';
+import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty, PetID } from '../../types';
 import { audio } from '../System/Audio';
 import { LESSON_NAMES, LESSON_DATA } from '../../store';
 
-// Available Shop Items (Traditional Chinese)
+// Available Shop Items
 const SHOP_ITEMS: ShopItem[] = [
+    {
+        id: 'MAGNET',
+        name: '強力磁鐵',
+        description: '被動技能：自動吸取附近的寶石，無冷卻時間。',
+        cost: 2000,
+        icon: Magnet,
+        oneTime: true
+    },
+    {
+        id: 'GEM_DOUBLER',
+        name: '寶石增幅器',
+        description: '被動技能：購買後「自動生效」，獲得的寶石數量翻倍 (x2)！',
+        cost: 3000,
+        icon: Diamond,
+        oneTime: true
+    },
+    {
+        id: 'PET_MARIO',
+        name: '水管工夥伴',
+        description: '夥伴：自動收集當前跑道寶石，並使獎勵再翻倍！(若已有增幅器，將疊加為 x4 倍)',
+        cost: 5000,
+        icon: User,
+        oneTime: true,
+        petId: PetID.MARIO
+    },
+    {
+        id: 'PET_PIKACHU',
+        name: '雷電鼠夥伴',
+        description: '夥伴：每3秒發射閃電攻擊前方障礙物。',
+        cost: 5000,
+        icon: Zap,
+        oneTime: true,
+        petId: PetID.PIKACHU
+    },
+    {
+        id: 'PET_MECHA',
+        name: '暗夜機甲翼',
+        description: '被動技能：裝備後，選錯字不會扣除生命值 (撞到障礙物仍會受傷)。',
+        cost: 4500,
+        icon: Shield,
+        oneTime: true,
+        petId: PetID.MECHA
+    },
     {
         id: 'DOUBLE_JUMP',
         name: '二段跳躍',
@@ -23,31 +66,9 @@ const SHOP_ITEMS: ShopItem[] = [
         oneTime: true
     },
     {
-        id: 'MAX_LIFE',
-        name: '提升生命上限',
-        description: '永久增加一個生命格並恢復生命。',
-        cost: 1500,
-        icon: Activity
-    },
-    {
-        id: 'HEAL',
-        name: '修復工具包',
-        description: '立即恢復 1 點生命值。',
-        cost: 1000,
-        icon: PlusCircle
-    },
-    {
-        id: 'IMMORTAL',
-        name: '無敵模式',
-        description: '解鎖技能：按下 Enter/Z 鍵即可無敵 5 秒。',
-        cost: 3000,
-        icon: Shield,
-        oneTime: true
-    },
-    {
         id: 'FIREBALL',
         name: '烈焰衝擊',
-        description: '解鎖技能：按下 X 發射火焰摧毀障礙，並獲得 500 寶石 (冷卻 5 秒)。',
+        description: '解鎖技能：按下 X 發射火焰摧毀障礙，並獲得 500 寶石 (極速冷卻 1 秒)。',
         cost: 1500,
         icon: Flame,
         oneTime: true
@@ -69,61 +90,106 @@ const SHOP_ITEMS: ShopItem[] = [
         oneTime: true
     },
     {
-        id: 'GEM_DOUBLER',
-        name: '寶石增幅器',
-        description: '解鎖技能：按下「下」鍵，20秒內獲得寶石翻倍 (冷卻 3 秒)。',
+        id: 'IMMORTAL',
+        name: '無敵模式',
+        description: '解鎖技能：按下 Enter/Z 鍵即可無敵 5 秒。',
         cost: 3000,
-        icon: Diamond,
+        icon: Shield,
         oneTime: true
+    },
+    {
+        id: 'MAX_LIFE',
+        name: '提升生命上限',
+        description: '永久增加一個生命格並恢復生命。',
+        cost: 1500,
+        icon: Activity
+    },
+    {
+        id: 'HEAL',
+        name: '修復工具包',
+        description: '立即恢復 1 點生命值。',
+        cost: 1000,
+        icon: PlusCircle
     }
 ];
 
 const ShopScreen: React.FC = () => {
-    const { score, buyItem, closeShop, hasDoubleJump, hasImmortality, hasFireball, hasFlight, hasPassiveHeal, hasGemDoubler } = useStore();
-    const [items, setItems] = useState<ShopItem[]>([]);
+    const { score, buyItem, closeShop, hasDoubleJump, hasImmortality, hasFireball, hasFlight, hasPassiveHeal, hasGemDoubler, hasMagnet, ownedPets, activePets, togglePet } = useStore();
 
-    useEffect(() => {
-        let pool = SHOP_ITEMS.filter(item => {
-            if (item.id === 'DOUBLE_JUMP' && hasDoubleJump) return false;
-            if (item.id === 'IMMORTAL' && hasImmortality) return false;
-            if (item.id === 'FIREBALL' && hasFireball) return false;
-            if (item.id === 'FLIGHT' && hasFlight) return false;
-            if (item.id === 'PASSIVE_HEAL' && hasPassiveHeal) return false;
-            if (item.id === 'GEM_DOUBLER' && hasGemDoubler) return false;
-            return true;
-        });
-
-        pool = pool.sort(() => 0.5 - Math.random());
-        setItems(pool.slice(0, 3));
-    }, []);
+    const isOwned = (item: ShopItem) => {
+        if (item.petId) return ownedPets.includes(item.petId);
+        switch (item.id) {
+            case 'DOUBLE_JUMP': return hasDoubleJump;
+            case 'IMMORTAL': return hasImmortality;
+            case 'FIREBALL': return hasFireball;
+            case 'FLIGHT': return hasFlight;
+            case 'PASSIVE_HEAL': return hasPassiveHeal;
+            case 'GEM_DOUBLER': return hasGemDoubler;
+            case 'MAGNET': return hasMagnet;
+            default: return false;
+        }
+    };
 
     return (
-        <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-md overflow-y-auto">
-             <div className="flex flex-col items-center justify-center min-h-full py-8 px-4">
+        <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-md overflow-y-auto custom-scrollbar">
+             <div className="flex flex-col items-center justify-start min-h-full py-8 px-4">
                  <h2 className="text-3xl md:text-4xl font-black text-cyan-400 mb-2 font-cyber tracking-widest text-center">虛擬商店</h2>
-                 <div className="flex items-center text-yellow-400 mb-6 md:mb-8">
-                     <span className="text-base md:text-lg mr-2">目前寶石:</span>
-                     <span className="text-xl md:text-2xl font-bold">{score.toLocaleString()}</span>
+                 <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-xl px-6 py-2 rounded-full border border-yellow-500/30 flex items-center text-yellow-400 mb-6 shadow-[0_0_15px_rgba(255,215,0,0.2)]">
+                     <span className="text-base md:text-lg mr-2 font-bold">目前寶石:</span>
+                     <Diamond className="w-5 h-5 mr-1 fill-yellow-400" />
+                     <span className="text-xl md:text-2xl font-black font-mono">{score.toLocaleString()}</span>
                  </div>
 
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl w-full mb-8">
-                     {items.map(item => {
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl w-full mb-8">
+                     {SHOP_ITEMS.map(item => {
                          const Icon = item.icon;
+                         const owned = isOwned(item);
+                         const isSoldOut = item.oneTime && owned && !item.petId; // Skills are sold out
                          const canAfford = score >= item.cost;
+                         const isPet = !!item.petId;
+                         const isEquipped = isPet && activePets.includes(item.petId!);
+                         
                          return (
-                             <div key={item.id} className="bg-gray-900/80 border border-gray-700 p-4 md:p-6 rounded-xl flex flex-col items-center text-center hover:border-cyan-500 transition-colors">
-                                 <div className="bg-gray-800 p-3 md:p-4 rounded-full mb-3 md:mb-4">
-                                     <Icon className="w-6 h-6 md:w-8 md:h-8 text-cyan-400" />
+                             <div 
+                                key={item.id} 
+                                className={`relative border p-4 md:p-6 rounded-xl flex flex-col items-center text-center transition-all duration-300 ${
+                                    isSoldOut 
+                                        ? 'bg-gray-900/40 border-gray-800 opacity-60 grayscale' 
+                                        : 'bg-gray-900/80 border-gray-700 hover:border-cyan-500 hover:shadow-[0_0_15px_rgba(0,255,255,0.15)] hover:-translate-y-1'
+                                }`}
+                             >
+                                 <div className={`p-3 md:p-4 rounded-full mb-3 md:mb-4 ${isSoldOut ? 'bg-gray-800 text-gray-500' : 'bg-gray-800 text-cyan-400'}`}>
+                                     <Icon className="w-6 h-6 md:w-8 md:h-8" />
                                  </div>
-                                 <h3 className="text-lg md:text-xl font-bold mb-2">{item.name}</h3>
+                                 <h3 className={`text-lg md:text-xl font-bold mb-2 ${isSoldOut ? 'text-gray-500' : 'text-white'}`}>{item.name}</h3>
                                  <p className="text-gray-400 text-xs md:text-sm mb-4 h-10 md:h-12 flex items-center justify-center">{item.description}</p>
-                                 <button 
-                                    onClick={() => buyItem(item.id as any, item.cost)}
-                                    disabled={!canAfford}
-                                    className={`px-4 md:px-6 py-2 rounded font-bold w-full text-sm md:text-base ${canAfford ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110' : 'bg-gray-700 cursor-not-allowed opacity-50'}`}
-                                 >
-                                     {item.cost} 寶石
-                                 </button>
+                                 
+                                 {isPet && owned ? (
+                                     <button 
+                                        onClick={() => togglePet(item.petId!)}
+                                        className={`px-4 md:px-6 py-2 rounded font-bold w-full text-sm md:text-base transition-colors ${
+                                            isEquipped
+                                                ? 'bg-green-600 hover:bg-green-500 text-white border border-green-400'
+                                                : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                                        }`}
+                                     >
+                                         {isEquipped ? '已裝備 (點擊卸下)' : '點擊裝備'}
+                                     </button>
+                                 ) : (
+                                     <button 
+                                        onClick={() => buyItem(item.id as any, item.cost, item.petId)}
+                                        disabled={!canAfford || isSoldOut}
+                                        className={`px-4 md:px-6 py-2 rounded font-bold w-full text-sm md:text-base transition-colors ${
+                                            isSoldOut 
+                                                ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700' 
+                                                : canAfford 
+                                                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:brightness-110 text-white shadow-lg' 
+                                                    : 'bg-red-900/20 text-red-400 border border-red-900/50 cursor-not-allowed'
+                                        }`}
+                                     >
+                                         {isSoldOut ? '已購買' : (canAfford ? `${item.cost} 寶石` : '寶石不足')}
+                                     </button>
+                                 )}
                              </div>
                          );
                      })}
@@ -131,7 +197,7 @@ const ShopScreen: React.FC = () => {
 
                  <button 
                     onClick={closeShop}
-                    className="flex items-center px-8 md:px-10 py-3 md:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg md:text-xl rounded hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,0,255,0.4)]"
+                    className="flex items-center px-8 md:px-10 py-3 md:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg md:text-xl rounded hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,0,255,0.4)] mb-8"
                  >
                      繼續挑戰 <Play className="ml-2 w-5 h-5" fill="white" />
                  </button>
@@ -176,34 +242,27 @@ const MobileControls: React.FC = () => {
     const { 
         setManualSlowMotion, 
         hasFireball, lastFireballTime,
-        hasFlight, isFlying, flightStartTime, lastFlightEndTime,
-        hasGemDoubler, isGemDoublerActive, nextGemDoublerAvailableTime, gemDoublerEndTime,
+        hasFlight, isFlying, lastFlightEndTime,
         hasImmortality
     } = useStore();
     
-    // Status Calculation helpers (Duplicated locally for button visual states)
+    // Status Calculation helpers
     const [fireballCooldown, setFireballCooldown] = useState(0);
     const [flightCooldown, setFlightCooldown] = useState(0);
-    const [gemCooldown, setGemCooldown] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
             const now = Date.now();
-            if (hasFireball) setFireballCooldown(Math.max(0, 5000 - (now - lastFireballTime))); 
+            if (hasFireball) setFireballCooldown(Math.max(0, 1000 - (now - lastFireballTime))); // 1 sec cooldown
             if (hasFlight) {
                 if (!isFlying) setFlightCooldown(Math.max(0, 20000 - (now - lastFlightEndTime)));
                 else setFlightCooldown(0);
             }
-            if (hasGemDoubler) {
-                if (!isGemDoublerActive) setGemCooldown(Math.max(0, nextGemDoublerAvailableTime - now));
-                else setGemCooldown(0);
-            }
-        }, 200);
+        }, 100);
         return () => clearInterval(interval);
-    }, [hasFireball, lastFireballTime, hasFlight, isFlying, lastFlightEndTime, hasGemDoubler, isGemDoublerActive, nextGemDoublerAvailableTime]);
+    }, [hasFireball, lastFireballTime, hasFlight, isFlying, lastFlightEndTime]);
 
     return (
-        // Updated padding to be safe from bottom bars (pb-8) and added style for safe-area support
         <div 
             className="absolute inset-0 pointer-events-none flex flex-col justify-end pb-8 px-4 z-[60]"
             style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
@@ -235,23 +294,6 @@ const MobileControls: React.FC = () => {
                         </button>
                     )}
 
-                    {hasGemDoubler && (
-                        <div className="flex flex-col items-center">
-                            <button
-                                onClick={() => window.dispatchEvent(new CustomEvent('cmd-gem-doubler'))}
-                                disabled={gemCooldown > 0 || isGemDoublerActive}
-                                className={`w-16 h-16 rounded-full border-2 flex items-center justify-center active:scale-95 transition-all backdrop-blur-sm ${
-                                    isGemDoublerActive ? 'bg-pink-500/50 border-pink-300 animate-pulse' :
-                                    gemCooldown > 0 ? 'bg-gray-800/60 border-gray-600 opacity-50' : 
-                                    'bg-purple-600/40 border-purple-400 hover:bg-purple-500/50'
-                                }`}
-                            >
-                                <Diamond className={`w-7 h-7 ${isGemDoublerActive ? 'text-white' : 'text-purple-200'}`} />
-                            </button>
-                            {gemCooldown > 0 && <span className="text-[10px] text-gray-300 font-mono mt-1">{(gemCooldown/1000).toFixed(0)}s</span>}
-                        </div>
-                    )}
-
                     {hasFireball && (
                         <div className="flex flex-col items-center">
                             <button
@@ -264,7 +306,7 @@ const MobileControls: React.FC = () => {
                             >
                                 <Flame className="w-7 h-7 text-orange-200" />
                             </button>
-                            {fireballCooldown > 0 && <span className="text-[10px] text-gray-300 font-mono mt-1">{(fireballCooldown/1000).toFixed(0)}s</span>}
+                            {fireballCooldown > 0 && <span className="text-[10px] text-gray-300 font-mono mt-1">{(fireballCooldown/1000).toFixed(1)}s</span>}
                         </div>
                     )}
 
@@ -297,12 +339,14 @@ export const HUD: React.FC = () => {
     isManualSlowMotion, toggleLesson, selectedLessonIds, 
     victoryTarget, setVictoryTarget, highScore, consecutiveIgnores,
     startingLivesSetting, setStartingLives, maxSpeedSetting, setMaxSpeed,
-    difficulty, setDifficulty
+    difficulty, setDifficulty,
+    ttsEnabled, setTtsEnabled,
+    devMode, toggleDevMode
   } = useStore();
 
   const [imageError, setImageError] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
-  const [activeTab, setActiveTab] = useState<'KX' | 'HL' | 'NY'>('HL'); // Default to Hanlin
+  const [activeTab, setActiveTab] = useState<'KX' | 'HL' | 'NY'>('HL'); 
   
   useEffect(() => {
       const handleOnline = () => setIsOffline(false);
@@ -331,7 +375,22 @@ export const HUD: React.FC = () => {
   if (status === GameStatus.MENU) {
       return (
           <div className="absolute inset-0 flex items-center justify-center z-[100] bg-black/80 backdrop-blur-sm p-4 pointer-events-auto overflow-y-auto">
+              
+              {/* Developer Mode Toggle - Fixed Screen Position */}
+              <button
+                onClick={toggleDevMode}
+                className={`fixed top-4 right-4 z-[200] flex items-center px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                    devMode
+                    ? 'bg-green-900/90 text-green-400 border-green-500 shadow-[0_0_10px_lime]'
+                    : 'bg-gray-800/80 text-gray-500 border-gray-600 hover:bg-gray-700'
+                }`}
+              >
+                <Terminal className="w-3 h-3 mr-1" />
+                {devMode ? 'DEV MODE: ON' : 'DEV MODE'}
+              </button>
+
               <div className="relative w-full max-w-3xl rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,255,255,0.2)] border border-white/10 animate-in zoom-in-95 duration-500 my-4">
+                
                 <div className="relative w-full bg-gray-900 flex flex-col">
                      <div className="relative h-48 md:h-56 overflow-hidden bg-gray-900 shrink-0">
                         {!imageError ? (
@@ -363,6 +422,21 @@ export const HUD: React.FC = () => {
                                 <Settings className="w-4 h-4 mr-2" /> 遊戲設定
                             </div>
                             
+                            {/* TTS Toggle */}
+                            <div className="flex flex-wrap gap-4 mb-4">
+                                <button
+                                    onClick={() => setTtsEnabled(!ttsEnabled)}
+                                    className={`flex items-center px-4 py-2 rounded-lg font-bold transition-all border ${
+                                        ttsEnabled 
+                                        ? 'bg-green-600 border-green-400 text-white' 
+                                        : 'bg-gray-700 border-gray-600 text-gray-400'
+                                    }`}
+                                >
+                                    {ttsEnabled ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
+                                    {ttsEnabled ? '語音朗讀: 開啟' : '語音朗讀: 關閉'}
+                                </button>
+                            </div>
+
                             {/* Target Count */}
                             <div className="mb-4">
                                 <div className="text-sm text-gray-400 mb-2 flex items-center"><Target className="w-3 h-3 mr-1"/> 挑戰題數</div>
@@ -526,6 +600,8 @@ export const HUD: React.FC = () => {
       );
   }
 
+  // ... (Game Over and Victory Screens remain similar)
+
   if (status === GameStatus.GAME_OVER) {
       return (
           <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-sm overflow-y-auto custom-scrollbar">
@@ -550,7 +626,6 @@ export const HUD: React.FC = () => {
                     再試一次
                 </button>
                 
-                {/* WRONG ANSWER REVIEW LIST */}
                 <WrongAnswerReview />
               </div>
           </div>
@@ -581,7 +656,6 @@ export const HUD: React.FC = () => {
                     重新挑戰
                 </button>
 
-                {/* WRONG ANSWER REVIEW LIST */}
                 <WrongAnswerReview />
             </div>
         </div>
@@ -608,7 +682,7 @@ export const HUD: React.FC = () => {
             </div>
         </div>
         
-        {/* Progress Indicator - NOW SHOWS TOTAL / TARGET */}
+        {/* Progress Indicator */}
         <div className="absolute top-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-50">
              <div className="text-sm md:text-lg text-purple-300 font-bold tracking-wider font-mono bg-black/50 px-3 py-1 rounded-full border border-purple-500/30 backdrop-blur-sm">
                 答題進度: {totalCorrectAnswers} / {victoryTarget}
@@ -623,7 +697,23 @@ export const HUD: React.FC = () => {
              <div className="absolute top-20 md:top-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in duration-300">
                 
                 {/* QUESTION BOX */}
-                <div className="bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-2xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.3)] min-w-[280px] md:min-w-[400px] text-center">
+                <div className="bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-2xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.3)] min-w-[280px] md:min-w-[400px] text-center relative">
+                     {/* TTS Button on Question Box */}
+                     {ttsEnabled && (
+                         <button 
+                            onClick={() => {
+                                const cleanText = currentVocab.question.replace(/\(\s*\)/g, '').replace(/\s+/g, '');
+                                const u = new SpeechSynthesisUtterance(cleanText);
+                                u.lang = 'zh-TW';
+                                window.speechSynthesis.cancel();
+                                window.speechSynthesis.speak(u);
+                            }}
+                            className="absolute top-2 right-2 text-cyan-500 hover:text-white"
+                         >
+                             <Volume2 className="w-4 h-4" />
+                         </button>
+                     )}
+
                     <div className="flex items-center justify-center space-x-2 mb-2 text-cyan-400 opacity-80 text-sm font-mono tracking-widest">
                         <HelpCircle className="w-4 h-4" /> 
                         <span>請填入正確的字</span>
@@ -632,8 +722,8 @@ export const HUD: React.FC = () => {
                         {currentVocab.question}
                     </div>
                 </div>
-
-                {/* HINT SYSTEM: Show below question box */}
+                
+                {/* HINT SYSTEM (MOVED BELOW QUESTION) */}
                 {consecutiveIgnores >= 3 && (
                     <div className="mt-4 animate-bounce flex flex-col items-center">
                         <div className="text-xs text-yellow-300 mb-1 font-bold tracking-widest">提示: 正解為</div>

@@ -21,12 +21,20 @@ export enum ObjectType {
   SHOP_PORTAL = 'SHOP_PORTAL',
   ALIEN = 'ALIEN',
   MISSILE = 'MISSILE',
-  PROJECTILE = 'PROJECTILE'
+  PROJECTILE = 'PROJECTILE',
+  LIGHTNING = 'LIGHTNING'
 }
 
 export enum Difficulty {
   SIMPLE = 'SIMPLE',
   COMPLEX = 'COMPLEX'
+}
+
+export enum PetID {
+  NONE = 'NONE',
+  MARIO = 'MARIO', // Collects coins in lane + Double points
+  PIKACHU = 'PIKACHU', // Shoots lightning
+  MECHA = 'MECHA' // Prevents damage from wrong answers
 }
 
 export interface VocabItem {
@@ -78,6 +86,7 @@ export interface ShopItem {
     cost: number;
     icon: any; // Lucide icon component
     oneTime?: boolean; // If true, remove from pool after buying
+    petId?: PetID; // If this item unlocks a pet
 }
 
 // Global JSX Augmentation for React Three Fiber

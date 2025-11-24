@@ -1,4 +1,5 @@
 
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -11,15 +12,15 @@ import * as THREE from 'three';
 import { Text, Center } from '@react-three/drei';
 import { v4 as uuidv4 } from 'uuid';
 import { useStore } from '../../store';
-import { GameObject, ObjectType, LANE_WIDTH, SPAWN_DISTANCE, REMOVE_DISTANCE, GameStatus, NEON_COLORS, Difficulty } from '../../types';
+import { GameObject, ObjectType, LANE_WIDTH, SPAWN_DISTANCE, REMOVE_DISTANCE, GameStatus, NEON_COLORS, Difficulty, PetID } from '../../types';
 import { audio } from '../System/Audio';
 
 // Geometry Constants
 const OBSTACLE_HEIGHT = 1.6;
-const OBSTACLE_TALL_HEIGHT = 3.2; // Taller for double jump/fly requirement
+const OBSTACLE_TALL_HEIGHT = 3.2; 
 
 const OBSTACLE_GEOMETRY = new THREE.ConeGeometry(0.9, OBSTACLE_HEIGHT, 6);
-const OBSTACLE_TALL_GEOMETRY = new THREE.CylinderGeometry(0.7, 0.9, OBSTACLE_TALL_HEIGHT, 6); // Tall Tower
+const OBSTACLE_TALL_GEOMETRY = new THREE.CylinderGeometry(0.7, 0.9, OBSTACLE_TALL_HEIGHT, 6); 
 
 const OBSTACLE_GLOW_GEO = new THREE.ConeGeometry(0.9, OBSTACLE_HEIGHT, 6);
 const OBSTACLE_TALL_GLOW_GEO = new THREE.CylinderGeometry(0.75, 0.95, OBSTACLE_TALL_HEIGHT, 6);
@@ -37,15 +38,16 @@ const ALIEN_EYE_GEO = new THREE.SphereGeometry(0.1);
 const MISSILE_CORE_GEO = new THREE.CylinderGeometry(0.08, 0.08, 3.0, 8);
 const MISSILE_RING_GEO = new THREE.TorusGeometry(0.15, 0.02, 16, 32);
 
-// Projectile Geometry (Fireball)
+// Projectile Geometry
 const PROJECTILE_GEO = new THREE.SphereGeometry(0.4, 8, 8);
+const LIGHTNING_GEO = new THREE.CylinderGeometry(0.1, 0.3, 2.0, 8); // For Pikachu
 
 // Shadow Geometries
 const SHADOW_GEM_GEO = new THREE.CircleGeometry(0.6, 32);
 const SHADOW_ALIEN_GEO = new THREE.CircleGeometry(0.8, 32);
 const SHADOW_MISSILE_GEO = new THREE.PlaneGeometry(0.15, 3);
 const SHADOW_DEFAULT_GEO = new THREE.CircleGeometry(0.8, 6);
-const SHADOW_CHAR_GEO = new THREE.CircleGeometry(1.0, 16);
+const SHADOW_CHAR_GEO = new THREE.CircleGeometry(1.5, 16); 
 
 // Shop Geometries
 const SHOP_FRAME_GEO = new THREE.BoxGeometry(1, 7, 1); 
@@ -65,12 +67,12 @@ const createCharTexture = (char: string, color: string) => {
     if (ctx) {
         ctx.clearRect(0,0, 512, 512);
         ctx.fillStyle = color; 
-        ctx.font = 'bold 240px "Microsoft JhengHei", "Noto Sans TC", sans-serif';
+        ctx.font = '300px "Microsoft JhengHei", "Noto Sans TC", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(char, 256, 256);
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 12;
+        ctx.lineWidth = 6;
         ctx.strokeText(char, 256, 256);
     }
     const tex = new THREE.CanvasTexture(canvas);
@@ -195,7 +197,11 @@ export const LevelManager: React.FC = () => {
     isManualSlowMotion,
     addScore,
     registerIgnore,
-    difficulty
+    difficulty,
+    hasMagnet,
+    activePets,
+    lastPetActionTime,
+    updatePetActionTime
   } = useStore();
   
   const objectsRef = useRef<GameObject[]>([]);
@@ -222,7 +228,7 @@ export const LevelManager: React.FC = () => {
 
     } else if (isLevelUp && level > 1) {
         let furthestZ = -50;
-        const staticObjects = objectsRef.current.filter(o => o.type !== ObjectType.MISSILE && o.type !== ObjectType.PROJECTILE);
+        const staticObjects = objectsRef.current.filter(o => o.type !== ObjectType.MISSILE && o.type !== ObjectType.PROJECTILE && o.type !== ObjectType.LIGHTNING);
         if (staticObjects.length > 0) {
              furthestZ = Math.min(...staticObjects.map(o => o.position[2]));
         }
@@ -300,25 +306,76 @@ export const LevelManager: React.FC = () => {
 
     const enemies = currentObjects.filter(o => (o.type === ObjectType.OBSTACLE || o.type === ObjectType.ALIEN) && o.active);
     
+    // --- PIKACHU LIGHTNING LOGIC ---
+    if (activePets.includes(PetID.PIKACHU)) {
+        const now = Date.now();
+        if (now - lastPetActionTime > 3000) { // Every 3 seconds
+            updatePetActionTime();
+            newSpawns.push({
+                id: uuidv4(),
+                type: ObjectType.LIGHTNING,
+                position: [playerPos.x, 1.0, playerPos.z - 2],
+                active: true,
+                color: '#ffe600'
+            });
+            audio.playJump(false); // Reuse sound or add new
+            hasChanges = true;
+        }
+    }
+
     for (const obj of currentObjects) {
         let moveAmount = dist;
         const MISSILE_SPEED = 30;
-        const PROJECTILE_SPEED = 40; 
+        const PROJECTILE_SPEED = 40;
+        const LIGHTNING_SPEED = 50;
         
+        // MAGNET LOGIC
+        let applyMagnet = false;
+        
+        if (obj.type === ObjectType.GEM && obj.active) {
+            if (hasMagnet) {
+                applyMagnet = true;
+            } else if (activePets.includes(PetID.MARIO)) {
+                // Mario collects gems in current lane automatically if moderately close
+                const laneWidthHalf = LANE_WIDTH / 2;
+                const inSameLane = Math.abs(obj.position[0] - playerPos.x) < laneWidthHalf + 0.5;
+                if (inSameLane) applyMagnet = true;
+            }
+
+            if (applyMagnet) {
+                const dx = playerPos.x - obj.position[0];
+                const dy = (playerPos.y + 1) - obj.position[1];
+                const dz = playerPos.z - obj.position[2];
+                const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                
+                // Suction range: 15 units (or 25 for Mario bonus lane)
+                if (distance < 20) {
+                    const suctionSpeed = 15 * safeDelta;
+                    obj.position[0] += dx * suctionSpeed;
+                    obj.position[1] += dy * suctionSpeed;
+                    obj.position[2] += dz * suctionSpeed;
+                }
+            }
+        }
+
         if (obj.type === ObjectType.MISSILE) {
             moveAmount += MISSILE_SPEED * safeDelta * modifier; 
         } else if (obj.type === ObjectType.PROJECTILE) {
             moveAmount = 0;
             obj.position[2] -= PROJECTILE_SPEED * safeDelta;
+        } else if (obj.type === ObjectType.LIGHTNING) {
+            moveAmount = 0;
+            obj.position[2] -= LIGHTNING_SPEED * safeDelta;
         }
 
         const prevZ = obj.position[2];
         
-        if (obj.type !== ObjectType.PROJECTILE) {
+        if (obj.type !== ObjectType.PROJECTILE && obj.type !== ObjectType.LIGHTNING) {
             obj.position[2] += moveAmount;
         }
         
-        if (obj.type === ObjectType.PROJECTILE && obj.active) {
+        // Projectile / Lightning Collision with Enemies
+        if ((obj.type === ObjectType.PROJECTILE || obj.type === ObjectType.LIGHTNING) && obj.active) {
             for (const enemy of enemies) {
                 if (!enemy.active) continue;
                 
@@ -334,7 +391,7 @@ export const LevelManager: React.FC = () => {
                     window.dispatchEvent(new CustomEvent('particle-burst', { 
                         detail: { position: enemy.position, color: '#ffaa00' } 
                     }));
-                    audio.playDamage(); 
+                    audio.playProjectileHit(); 
                     break;
                 }
             }
@@ -379,7 +436,6 @@ export const LevelManager: React.FC = () => {
                 if (dx < 0.9) { 
                      
                      const isDamageSource = obj.type === ObjectType.OBSTACLE || obj.type === ObjectType.ALIEN || obj.type === ObjectType.MISSILE;
-                     const isCharacter = obj.type === ObjectType.LETTER;
                      
                      if (isDamageSource) {
                          const playerBottom = playerPos.y;
@@ -410,11 +466,13 @@ export const LevelManager: React.FC = () => {
                                 }));
                              }
                          }
-                     } else if (obj.type !== ObjectType.PROJECTILE) { 
+                     } else if (obj.type !== ObjectType.PROJECTILE && obj.type !== ObjectType.LIGHTNING) { 
                          const dy = Math.abs(obj.position[1] - playerPos.y);
-                         if (dy < 2.5) { 
+                         
+                         if (dy < 4.0) { 
                             if (obj.type === ObjectType.GEM) {
-                                collectGem(obj.points || 50);
+                                // If Mario, multiplier handled inside collectGem
+                                collectGem(obj.points || 50, activePets.includes(PetID.MARIO));
                                 audio.playGemCollect();
                                 window.dispatchEvent(new CustomEvent('particle-burst', { 
                                     detail: { position: obj.position, color: obj.color || '#ffffff' } 
@@ -442,7 +500,7 @@ export const LevelManager: React.FC = () => {
             }
         }
 
-        if (obj.position[2] > REMOVE_DISTANCE && obj.type !== ObjectType.PROJECTILE) {
+        if (obj.position[2] > REMOVE_DISTANCE && obj.type !== ObjectType.PROJECTILE && obj.type !== ObjectType.LIGHTNING) {
             if (obj.type === ObjectType.LETTER && obj.isTarget && obj.active) {
                 registerIgnore();
             }
@@ -461,7 +519,7 @@ export const LevelManager: React.FC = () => {
 
     // Spawning Logic
     let furthestZ = -20;
-    const staticObjects = keptObjects.filter(o => o.type !== ObjectType.MISSILE && o.type !== ObjectType.PROJECTILE);
+    const staticObjects = keptObjects.filter(o => o.type !== ObjectType.MISSILE && o.type !== ObjectType.PROJECTILE && o.type !== ObjectType.LIGHTNING);
     if (staticObjects.length > 0) {
         furthestZ = Math.min(...staticObjects.map(o => o.position[2]));
     }
@@ -474,7 +532,6 @@ export const LevelManager: React.FC = () => {
          const isQuestionDue = distanceTraveled.current >= nextSpawnDistance.current;
 
          if (isQuestionDue && currentVocab) {
-             // ... [Question spawning logic remains same]
              const lane = getRandomLane(laneCount);
              const isTarget = Math.random() < 0.4;
              const val = isTarget ? currentVocab.char : getRandomDistractor();
@@ -482,7 +539,7 @@ export const LevelManager: React.FC = () => {
              keptObjects.push({
                 id: uuidv4(),
                 type: ObjectType.LETTER,
-                position: [lane * LANE_WIDTH, 1.8, spawnZ], 
+                position: [lane * LANE_WIDTH, 2.5, spawnZ], 
                 active: true,
                 color: NEON_COLORS[Math.floor(Math.random() * NEON_COLORS.length)],
                 value: val,
@@ -509,41 +566,68 @@ export const LevelManager: React.FC = () => {
                         hasFired: false
                     });
                 } else {
-                    // --- COMPLEX DIFFICULTY LOGIC ---
                     const availableLanes = [];
                     const maxLane = Math.floor(laneCount / 2);
                     for (let i = -maxLane; i <= maxLane; i++) availableLanes.push(i);
                     availableLanes.sort(() => Math.random() - 0.5);
 
-                    // Wall / Tower Logic for Complex Difficulty
-                    const spawnWall = difficulty === Difficulty.COMPLEX && Math.random() < 0.15; // 15% chance for wall
-                    const spawnTower = difficulty === Difficulty.COMPLEX && Math.random() < 0.15; // 15% chance for tall tower
+                    const spawnWall = difficulty === Difficulty.COMPLEX && Math.random() < 0.15; 
+                    const spawnTower = difficulty === Difficulty.COMPLEX && Math.random() < 0.15; 
 
                     if (spawnWall) {
-                        // Spawn Standard Obstacles in ALL lanes (Wall)
                         for (let i = -maxLane; i <= maxLane; i++) {
                             keptObjects.push({
                                 id: uuidv4(),
                                 type: ObjectType.OBSTACLE,
                                 position: [i * LANE_WIDTH, OBSTACLE_HEIGHT / 2, spawnZ],
                                 active: true,
-                                color: '#ff0000', // Redder for walls
+                                color: '#ff0000', 
                                 variant: 'normal'
                             });
                         }
                     } else if (spawnTower) {
-                        // Spawn Tall Obstacle (Requires Double Jump/Fly)
-                        const lane = availableLanes[0];
-                        keptObjects.push({
-                            id: uuidv4(),
-                            type: ObjectType.OBSTACLE,
-                            position: [lane * LANE_WIDTH, OBSTACLE_TALL_HEIGHT / 2, spawnZ],
-                            active: true,
-                            color: '#9900ff', // Purple for tall
-                            variant: 'tall'
-                        });
+                        const maxLane = Math.floor(laneCount / 2);
+                        const allLanes = [];
+                        for (let k = -maxLane; k <= maxLane; k++) allLanes.push(k);
+
+                        const patternType = Math.random();
+
+                        // Pattern 1: Funnel / Single Path (Most Dangerous)
+                        // Blocks ALL lanes except one. Player must be in that lane.
+                        if (patternType < 0.4) {
+                            const safeLaneIndex = Math.floor(Math.random() * allLanes.length);
+                            allLanes.forEach((laneIdx, idx) => {
+                                if (idx !== safeLaneIndex) {
+                                    keptObjects.push({
+                                        id: uuidv4(),
+                                        type: ObjectType.OBSTACLE,
+                                        position: [laneIdx * LANE_WIDTH, OBSTACLE_TALL_HEIGHT / 2, spawnZ],
+                                        active: true,
+                                        color: '#9900ff',
+                                        variant: 'tall'
+                                    });
+                                }
+                            });
+                        } 
+                        // Pattern 2: Multi-Tower (Side-by-side or Split)
+                        // Spawns 2 towers (or 1 if narrow).
+                        else {
+                             // Shuffle lanes to pick random spots
+                             allLanes.sort(() => Math.random() - 0.5);
+                             const countToSpawn = Math.min(2, allLanes.length); // Spawn up to 2
+
+                             for(let k = 0; k < countToSpawn; k++) {
+                                 keptObjects.push({
+                                    id: uuidv4(),
+                                    type: ObjectType.OBSTACLE,
+                                    position: [allLanes[k] * LANE_WIDTH, OBSTACLE_TALL_HEIGHT / 2, spawnZ],
+                                    active: true,
+                                    color: '#9900ff',
+                                    variant: 'tall'
+                                });
+                             }
+                        }
                     } else {
-                        // Standard Random Spikes
                         const spawnCountBase = Math.floor(laneCount / 2); 
                         const variation = Math.random() > 0.5 ? 1 : 0;
                         let countToSpawn = Math.max(1, spawnCountBase + variation);
@@ -606,7 +690,7 @@ export const LevelManager: React.FC = () => {
   );
 };
 
-// ... [CharSprite component stays the same] ...
+// ... [CharSprite component] ...
 const CharSprite: React.FC<{ value: string, color: string }> = ({ value, color }) => {
     const texture = useMemo(() => createCharTexture(value, color), [value, color]);
     useEffect(() => {
@@ -615,7 +699,7 @@ const CharSprite: React.FC<{ value: string, color: string }> = ({ value, color }
     
     return (
         <mesh>
-            <planeGeometry args={[3.0, 3.0]} />
+            <planeGeometry args={[4.5, 4.5]} />
             <meshBasicMaterial map={texture} transparent={true} side={THREE.DoubleSide} alphaTest={0.5} depthWrite={true} />
         </mesh>
     );
@@ -639,7 +723,7 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
             } else if (data.type === ObjectType.MISSILE) {
                  visualRef.current.rotation.z += delta * 20; 
                  visualRef.current.position.y = baseHeight;
-            } else if (data.type === ObjectType.PROJECTILE) {
+            } else if (data.type === ObjectType.PROJECTILE || data.type === ObjectType.LIGHTNING) {
                  visualRef.current.position.y = baseHeight;
                  visualRef.current.rotation.x += delta * 10;
                  visualRef.current.rotation.y += delta * 10;
@@ -670,7 +754,7 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
         if (data.type === ObjectType.SHOP_PORTAL) return null; 
         if (data.type === ObjectType.ALIEN) return SHADOW_ALIEN_GEO;
         if (data.type === ObjectType.MISSILE) return SHADOW_MISSILE_GEO;
-        if (data.type === ObjectType.PROJECTILE) return null; 
+        if (data.type === ObjectType.PROJECTILE || data.type === ObjectType.LIGHTNING) return null; 
         return SHADOW_DEFAULT_GEO; 
     }, [data.type]);
 
@@ -708,7 +792,6 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
                 {data.type === ObjectType.OBSTACLE && (
                     <group>
                         {data.variant === 'tall' ? (
-                             // Tall Tower
                              <>
                                  <mesh geometry={OBSTACLE_TALL_GEOMETRY} castShadow receiveShadow>
                                      <meshStandardMaterial color="#2a0033" roughness={0.3} metalness={0.9} />
@@ -718,7 +801,6 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
                                  </mesh>
                              </>
                         ) : (
-                             // Standard Cone
                              <>
                                  <mesh geometry={OBSTACLE_GEOMETRY} castShadow receiveShadow>
                                      <meshStandardMaterial color="#330011" roughness={0.3} metalness={0.8} flatShading={true} />
@@ -760,6 +842,13 @@ const GameEntity: React.FC<{ data: GameObject }> = React.memo(({ data }) => {
                 
                 {/* PROJECTILE */}
                 {data.type === ObjectType.PROJECTILE && <mesh geometry={PROJECTILE_GEO}><meshBasicMaterial color="#ff5500" /></mesh>}
+
+                {/* LIGHTNING */}
+                {data.type === ObjectType.LIGHTNING && (
+                    <mesh geometry={LIGHTNING_GEO} rotation={[Math.PI/2, 0, 0]}>
+                        <meshBasicMaterial color="#ffff00" />
+                    </mesh>
+                )}
 
                 {/* GEM */}
                 {data.type === ObjectType.GEM && <mesh castShadow geometry={GEM_GEOMETRY}><meshStandardMaterial color={data.color} roughness={0} metalness={1} emissive={data.color} emissiveIntensity={2} /></mesh>}
