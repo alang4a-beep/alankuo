@@ -21,18 +21,18 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'KX_1_2': [
         { char: '這', question: '( )ㄓㄜˋ 裡' }, { char: '是', question: '不( )ㄕˋ' }, { char: '誰', question: '( )ㄕㄟˊ 的' }, 
         { char: '的', question: '我( )ㄉㄜ˙' }, { char: '我', question: '( )ㄨㄛˇ 們' }, { char: '分', question: '( )ㄈㄣ 開' }, 
-        { char: '好', question: '( )ㄏㄠˇ 人' }, { char: '了', question: '走( )ㄌㄜ˙' }, { char: '啊', question: '好( )ㄚ˙' }, 
+        { char: '好', question: '( )ㄏㄠˇ 人' }, { char: '了', question: '走( )ㄌㄜ˙' }, { char: '啊', question: '好( )ㄚ' }, 
         { char: '多', question: '很( )ㄉㄨㄛ' }, { char: '個', question: '一( )ㄍㄜ˙' }
     ],
     'KX_1_3': [
-        { char: '秋', question: '( )ㄑㄧㄡ 千' }, { char: '千', question: '( )ㄑㄧㄢ 萬' }, { char: '和', question: '( )ㄏㄢˋ 平' }, 
+        { char: '秋', question: '( )ㄑㄧㄡ 千' }, { char: '千', question: '( )ㄑㄧㄢ 萬' }, { char: '和', question: '( )ㄏㄜˊ 平' }, 
         { char: '玩', question: '( )ㄨㄢˊ 具' }, { char: '陪', question: '( )ㄆㄟˊ 伴' }, { char: '高', question: '( )ㄍㄠ 興' }, 
         { char: '山', question: '爬( )ㄕㄢ' }, { char: '到', question: '遲( )ㄉㄠˋ' }, { char: '大', question: '( )ㄉㄚˋ 象' }, 
         { char: '海', question: '( )ㄏㄞˇ 邊' }, { char: '朋', question: '( )ㄆㄥˊ 友' }, { char: '友', question: '好( )ㄧㄡˇ' }, 
         { char: '們', question: '人( )ㄇㄣ˙' }, { char: '起', question: '一( )ㄑㄧˇ' }
     ],
     'KX_1_4': [
-        { char: '子', question: '孩( )ㄗˇ' }, { char: '小', question: '( )ㄒㄧㄠˇ 孩' }, { char: '課', question: '上( )ㄎㄜˋ' }, 
+        { char: '子', question: '孩( )ㄗ˙' }, { char: '小', question: '( )ㄒㄧㄠˇ 孩' }, { char: '課', question: '上( )ㄎㄜˋ' }, 
         { char: '兩', question: '( )ㄌㄧㄤˇ 個' }, { char: '人', question: '大( )ㄖㄣˊ' }, { char: '拉', question: '( )ㄌㄚ 手' }, 
         { char: '看', question: '( )ㄎㄢˋ 見' }, { char: '找', question: '尋( )ㄓㄠˇ' }, { char: '隻', question: '一( )ㄓ' }, 
         { char: '青', question: '( )ㄑㄧㄥ 蛙' }, { char: '蛙', question: '青( )ㄨㄚ' }, { char: '開', question: '( )ㄎㄞ 門' }, 
@@ -40,8 +40,8 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     ],
     'KX_1_5': [
         { char: '比', question: '( )ㄅㄧˇ 較' }, { char: '門', question: '大( )ㄇㄣˊ' }, { char: '裡', question: '( )ㄌㄧˇ 面' }, 
-        { char: '外', question: '( )ㄨㄞˋ 面' }, { char: '有', question: '擁( )ㄧㄡˇ' }, { char: '什', question: '( )ㄕㄜˊ 麼' }, 
-        { char: '麼', question: '什( )ㄇㄜ˙' }, { char: '不', question: '( )ㄅㄨˋ 是' }, { char: '同', question: '( )ㄊㄨㄥˊ 學' }, 
+        { char: '外', question: '( )ㄨㄞˋ 面' }, { char: '有', question: '擁( )ㄧㄡˇ' }, { char: '什', question: '( )ㄕㄣˊ 麼' }, 
+        { char: '麼', question: '什( )ㄇㄜ˙' }, { char: '不', question: '( )ㄅㄨˊ 是' }, { char: '同', question: '( )ㄊㄨㄥˊ 學' }, 
         { char: '早', question: '( )ㄗㄠˇ 上' }, { char: '晚', question: '( )ㄨㄢˇ 上' }, { char: '王', question: '國( )ㄨㄤˊ' }, 
         { char: '主', question: '( )ㄓㄨˇ 人' }, { char: '又', question: '( )ㄧㄡˋ 來' }
     ],
@@ -49,7 +49,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '路', question: '馬( )ㄌㄨˋ' }, { char: '長', question: '( )ㄔㄤˊ 短' }, { char: '白', question: '( )ㄅㄞˊ 色' }, 
         { char: '花', question: '紅( )ㄏㄨㄚ' }, { char: '紅', question: '( )ㄏㄨㄥˊ 花' }, { char: '走', question: '( )ㄗㄡˇ 路' }, 
         { char: '在', question: '現( )ㄗㄞˋ' }, { char: '向', question: '方( )ㄒㄧㄤˋ' }, { char: '說', question: '( )ㄕㄨㄛ 話' }, 
-        { char: '朵', question: '花( )ㄉㄨㄛˇ' }, { char: '從', question: '( )ㄘㄨㄥˊ 前' }, { char: '頭', question: '( )ㄊㄡˊ 髮' }, 
+        { char: '朵', question: '花( )ㄉㄨㄛ˙' }, { char: '從', question: '( )ㄘㄨㄥˊ 前' }, { char: '頭', question: '( )ㄊㄡˊ 髮' }, 
         { char: '那', question: '( )ㄋㄚˋ 裡' }
     ],
 
@@ -60,13 +60,13 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '年', question: '新( )ㄋㄧㄢˊ' }, { char: '希', question: '( )ㄒㄧ 望' }, { char: '望', question: '願( )ㄨㄤˋ' }, { char: '坐', question: '( )ㄗㄨㄛˋ 下' },
         { char: '位', question: '座( )ㄨㄟˋ' }, { char: '本', question: '課( )ㄅㄣˇ' }, { char: '淡', question: '平( )ㄉㄢˋ' }, { char: '書', question: '讀( )ㄕㄨ' },
         { char: '老', question: '( )ㄌㄠˇ 師' }, { char: '師', question: '老( )ㄕ' }, { char: '以', question: '所( )ㄧˇ' }, { char: '為', question: '因( )ㄨㄟˋ' },
-        { char: '故', question: '( )ㄍㄨˋ 事' }, { char: '用', question: '( )ㄩㄥˋ 功' }, { char: '力', question: '力( )ㄌㄧˋ' }, { char: '只', question: '( )ㄓˇ 是' },
+        { char: '故', question: '( )ㄍㄨˋ 事' }, { char: '用', question: '( )ㄩㄥˋ 功' }, { char: '力', question: '用( )ㄌㄧˋ' }, { char: '只', question: '( )ㄓˇ 是' },
         { char: '現', question: '( )ㄒㄧㄢˋ 在' }, { char: '還', question: '( )ㄏㄞˊ 有' }
     ],
     'KX_2_2': [
         { char: '全', question: '( )ㄑㄩㄢˊ 部' }, { char: '蛋', question: '雞( )ㄉㄢˋ' }, { char: '煎', question: '( )ㄐㄧㄢ 蛋' }, { char: '圓', question: '( )ㄩㄢˊ 形' },
         { char: '番', question: '( )ㄈㄢ 茄' }, { char: '茄', question: '番( )ㄑㄧㄝˊ' }, { char: '切', question: '( )ㄑㄧㄝ 菜' }, { char: '輪', question: '車( )ㄌㄨㄣˊ' },
-        { char: '司', question: '土( )ㄙ' }, { char: '夾', question: '( )ㄐㄧㄚ 住' }, { char: '吐', question: '( )ㄊㄨˇ 司' }, { char: '中', question: '( )ㄓㄨㄥ 間' },
+        { char: '司', question: '土( )ㄙ' }, { char: '夾', question: '( )ㄐㄧㄚ 裡' }, { char: '吐', question: '( )ㄊㄨˇ 司' }, { char: '中', question: '( )ㄓㄨㄥ 間' },
         { char: '方', question: '( )ㄈㄤ 形' }, { char: '城', question: '( )ㄔㄥˊ 堡' }, { char: '堡', question: '漢( )ㄅㄠˇ' }, { char: '接', question: '( )ㄐㄧㄝ 著' },
         { char: '畫', question: '( )ㄏㄨㄚˋ 圖' }, { char: '臉', question: '洗( )ㄌㄧㄢˇ' }
     ],
@@ -79,7 +79,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     ],
     'KX_2_4': [
         { char: '運', question: '( )ㄩㄣˋ 動' }, { char: '動', question: '活( )ㄉㄨㄥˋ' }, { char: '飄', question: '( )ㄆㄧㄠ 揚' }, { char: '熱', question: '( )ㄖㄜˋ 鬧' },
-        { char: '鬧', question: '吵( )ㄋㄠˋ' }, { char: '舞', question: '跳( )ㄨˇ' }, { char: '哇', question: '( )ㄨㄚ 塞' }, { char: '往', question: '來( )ㄨㄤˇ' },
+        { char: '鬧', question: '吵( )ㄋㄠˋ' }, { char: '舞', question: '跳( )ㄨˇ' }, { char: '哇', question: '( )ㄨㄚ 賽' }, { char: '往', question: '來( )ㄨㄤˇ' },
         { char: '容', question: '笑( )ㄖㄨㄥˊ' }, { char: '步', question: '跑( )ㄅㄨˋ' }, { char: '汗', question: '流( )ㄏㄢˋ' }, { char: '腳', question: '( )ㄐㄧㄠˇ 步' },
         { char: '協', question: '( )ㄒㄧㄝˊ 力' }, { char: '聲', question: '大( )ㄕㄥ' }, { char: '河', question: '拔( )ㄏㄜˊ' }, { char: '氣', question: '生( )ㄑㄧˋ' },
         { char: '最', question: '( )ㄗㄨㄟˋ 好' }, { char: '可', question: '( )ㄎㄜˇ 愛' }
@@ -103,7 +103,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '單', question: '簡( )ㄉㄢ' }, { char: '聰', question: '( )ㄘㄨㄥ 明' }, { char: '明', question: '聰( )ㄇㄧㄥˊ' }, { char: '臣', question: '大( )ㄔㄣˊ' },
         { char: '敢', question: '勇( )ㄍㄢˇ' }, { char: '東', question: '( )ㄉㄨㄥ 西' }, { char: '西', question: '東( )ㄒㄧ' }, { char: '直', question: '一( )ㄓˊ' },
         { char: '棒', question: '好( )ㄅㄤˋ' }, { char: '街', question: '大( )ㄐㄧㄝ' }, { char: '滿', question: '( )ㄇㄢˇ 意' }, { char: '眼', question: '( )ㄧㄢˇ 睛' },
-        { char: '哪', question: '( )ㄋㄚˇ 裡' }, { char: '思', question: '意( )ㄙ' }
+        { char: '哪', question: '( )ㄋㄚˇ 裡' }, { char: '思', question: '意( )ㄙ˙' }
     ],
     'KX_2_8': [
         { char: '渴', question: '口( )ㄎㄜˇ' }, { char: '烏', question: '( )ㄨ 鴉' }, { char: '喝', question: '( )ㄏㄜ 水' }, { char: '瓶', question: '( )ㄆㄧㄥˊ 子' },
@@ -142,7 +142,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     ],
     
     // =========================================================================
-    // 康軒 (Kangxuan) - Grade 3 (ADDED)
+    // 康軒 (Kangxuan) - Grade 3
     // =========================================================================
     'KX_3_1': [
         { char: '字', question: '生( )ㄗˋ' }, { char: '舟', question: '輕( )ㄓㄡ' }, { char: '灑', question: '( )ㄙㄚˇ 水' }, { char: '載', question: '( )ㄗㄞˋ 重' },
@@ -229,7 +229,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'NY_1_2': [
         { char: '開', question: '( )ㄎㄞ 車' }, { char: '出', question: '( )ㄔㄨ 去' }, { char: '招', question: '( )ㄓㄠ 手' }, 
         { char: '車', question: '汽( )ㄔㄜ' }, { char: '子', question: '椅( )ㄗ˙' }, { char: '地', question: '土( )ㄉㄧˋ' }, 
-        { char: '花', question: '( )ㄏㄨㄚ 園' }, { char: '朵', question: '耳( )ㄉㄨㄛˇ' }, { char: '在', question: '正( )ㄗㄞˋ' }, 
+        { char: '花', question: '( )ㄏㄨㄚ 園' }, { char: '朵', question: '耳( )ㄉㄨㄛ˙' }, { char: '在', question: '正( )ㄗㄞˋ' }, 
         { char: '笑', question: '微( )ㄒㄧㄠˋ' }
     ],
     'NY_1_3': [
@@ -248,18 +248,18 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '外', question: '( )ㄨㄞˋ 頭' }, { char: '住', question: '居( )ㄓㄨˋ' }, { char: '個', question: '一( )ㄍㄜ˙' }, 
         { char: '們', question: '它( )ㄇㄣ˙' }, { char: '這', question: '( )ㄓㄜˋ 個' }, { char: '裡', question: '家( )ㄌㄧˇ' }, 
         { char: '有', question: '沒( )ㄧㄡˇ' }, { char: '沒', question: '( )ㄇㄟˊ 有' }, { char: '是', question: '都( )ㄕˋ' }, 
-        { char: '什', question: '( )ㄕㄜˊ 麼' }, { char: '麼', question: '什( )ㄇㄜ˙' }
+        { char: '什', question: '( )ㄕㄣˊ 麼' }, { char: '麼', question: '什( )ㄇㄜ˙' }
     ],
     'NY_1_6': [
         { char: '金', question: '( )ㄐㄧㄣ 魚' }, { char: '說', question: '( )ㄕㄨㄛ 話' }, { char: '句', question: '造( )ㄐㄩˋ' }, 
         { char: '話', question: '笑( )ㄏㄨㄚˋ' }, { char: '兩', question: '( )ㄌㄧㄤˇ 隻' }, { char: '都', question: '( )ㄉㄡ 是' }, 
-        { char: '悄', question: '( )ㄑㄧㄠˇ 悄' }, { char: '尾', question: '( )ㄨㄟˇ 巴' }, { char: '巴', question: '尾( )ㄅㄚ' }, 
+        { char: '悄', question: '( )ㄑㄧㄠˇ 悄' }, { char: '尾', question: '( )ㄨㄟˇ 巴' }, { char: '巴', question: '尾( )ㄅㄚ˙' }, 
         { char: '滿', question: '( )ㄇㄢˇ 意' }, { char: '紅', question: '( )ㄏㄨㄥˊ 色' }
     ],
     'NY_1_7': [
-        { char: '春', question: '( )ㄔㄨㄣ 節' }, { char: '貼', question: '( )ㄊㄧㄝ 紙' }, { char: '呢', question: '你( )ㄋㄜ˙' }, 
+        { char: '春', question: '( )ㄔㄨㄣ 節' }, { char: '貼', question: '( )ㄊㄧㄝ 紙' }, { char: '呢', question: '你( )ㄋㄜ' }, 
         { char: '了', question: '好( )ㄌㄜ˙' }, { char: '請', question: '( )ㄑㄧㄥˇ 客' }, { char: '天', question: '( )ㄊㄧㄢ 氣' }, 
-        { char: '家', question: '回( )ㄐㄧㄚ' }, { char: '把', question: '門( )ㄅㄚˇ' }, { char: '不', question: '( )ㄅㄨˋ 要' }, 
+        { char: '家', question: '回( )ㄐㄧㄚ' }, { char: '把', question: '門( )ㄅㄚˇ' }, { char: '不', question: '( )ㄅㄨˊ 要' }, 
         { char: '房', question: '( )ㄈㄤˊ 子' }, { char: '福', question: '幸( )ㄈㄨˊ' }
     ],
 
@@ -270,7 +270,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '呼', question: '( )ㄏㄨ 吸' }, { char: '白', question: '( )ㄅㄞˊ 雲' }, { char: '雲', question: '烏( )ㄩㄣˊ' }, { char: '柔', question: '溫( )ㄖㄡˊ' },
         { char: '前', question: '( )ㄑㄧㄢˊ 面' }, { char: '游', question: '( )ㄧㄡˊ 泳' }, { char: '噴', question: '( )ㄆㄣ 水' }, { char: '美', question: '( )ㄇㄟˇ 女' },
         { char: '麗', question: '壯( )ㄌㄧˋ' }, { char: '柱', question: '石( )ㄓㄨˋ' }, { char: '試', question: '考( )ㄕˋ' }, { char: '吸', question: '( )ㄒㄧ 管' },
-        { char: '用', question: '利( )ㄩㄥˋ' }, { char: '力', question: '努( )ㄌㄧˋ' }, { char: '哇', question: '( )ㄨㄚ 叫' }, { char: '又', question: '( )ㄧㄡˋ 是' },
+        { char: '用', question: '利( )ㄩㄥˋ' }, { char: '力', question: '努( )ㄌㄧˋ' }, { char: '哇', question: '( )ㄨㄚ 哇叫' }, { char: '又', question: '( )ㄧㄡˋ 是' },
         { char: '第', question: '( )ㄉㄧˋ 一' }, { char: '功', question: '( )ㄍㄨㄥ 課' }
     ],
     'NY_2_2': [
@@ -297,9 +297,9 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'NY_2_5': [
         { char: '蟲', question: '毛毛( )ㄔㄨㄥˊ' }, { char: '森', question: '( )ㄙㄣ 林' }, { char: '動', question: '( )ㄉㄨㄥˋ 物' }, { char: '物', question: '人( )ㄨˋ' },
         { char: '王', question: '國( )ㄨㄤˊ' }, { char: '坐', question: '( )ㄗㄨㄛˋ 下' }, { char: '午', question: '中( )ㄨˇ' }, { char: '停', question: '( )ㄊㄧㄥˊ 車' },
-        { char: '座', question: '( )ㄗㄨㄛˋ 位' }, { char: '急', question: '著( )ㄐㄧˊ' }, { char: '百', question: '( )ㄅㄞˇ 分' }, { char: '科', question: '( )ㄎㄜ 學' },
+        { char: '座', question: '( )ㄗㄨㄛˋ 位' }, { char: '急', question: '著( )ㄐㄧˊ' }, { char: '百', question: '一( )ㄅㄞˇ 分' }, { char: '科', question: '( )ㄎㄜ 學' },
         { char: '全', question: '( )ㄑㄩㄢˊ 部' }, { char: '原', question: '草( )ㄩㄢˊ' }, { char: '從', question: '( )ㄘㄨㄥˊ 前' }, { char: '此', question: '因( )ㄘˇ' },
-        { char: '管', question: '吸( )ㄍㄨㄢˇ' }, { char: '種', question: '( )ㄓㄨㄥˇ 樹' }
+        { char: '管', question: '吸( )ㄍㄨㄢˇ' }, { char: '種', question: '( )ㄓㄨㄥˋ 樹' }
     ],
     'NY_2_6': [
         { char: '自', question: '( )ㄗˋ 己' }, { char: '己', question: '自( )ㄐㄧˇ' }, { char: '沙', question: '( )ㄕㄚ 發' }, { char: '撿', question: '( )ㄐㄧㄢˇ 起來' },
@@ -325,7 +325,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'NY_2_9': [
         { char: '赤', question: '( )ㄔˋ 腳' }, { char: '國', question: '( )ㄍㄨㄛˊ 家' }, { char: '熱', question: '( )ㄖㄜˋ 鬧' }, { char: '宮', question: '皇( )ㄍㄨㄥ' },
         { char: '涼', question: '冰( )ㄌㄧㄤˊ' }, { char: '踩', question: '( )ㄘㄞˇ 踏' }, { char: '毯', question: '地( )ㄊㄢˇ' }, { char: '暖', question: '溫( )ㄋㄨㄢˇ' },
-        { char: '馬', question: '( )ㄇㄚˇ 上' }, { char: '壞', question: '( )ㄏㄨㄞˋ 人' }, { char: '難', question: '困( )ㄋㄢˊ' }, { char: '定', question: '決( )ㄉㄧㄥˋ' },
+        { char: '馬', question: '( )ㄇㄚˇ 上' }, { char: '壞', question: '( )ㄏㄨㄞˋ 人' }, { char: '難', question: '困( )ㄋㄢˊ' }, { char: '決', question: '決( )ㄉㄧㄥˋ' },
         { char: '更', question: '( )ㄍㄥˋ 好' }, { char: '隨', question: '( )ㄙㄨㄟˊ 便' }, { char: '主', question: '( )ㄓㄨˇ 人' }, { char: '法', question: '方( )ㄈㄚˇ' },
         { char: '於', question: '終( )ㄩˊ' }, { char: '舒', question: '( )ㄕㄨ 服' }
     ],
@@ -339,7 +339,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'NY_2_11': [
         { char: '湯', question: '喝( )ㄊㄤ' }, { char: '今', question: '( )ㄐㄧㄣ 天' }, { char: '至', question: '冬( )ㄓˋ' }, { char: '妹', question: '姐( )ㄇㄟˋ' },
         { char: '升', question: '上( )ㄕㄥ' }, { char: '陽', question: '太( )ㄧㄤˊ' }, { char: '因', question: '原( )ㄧㄣ' }, { char: '期', question: '星( )ㄑㄧˊ' },
-        { char: '盯', question: '( )ㄉㄧㄥ 著' }, { char: '米', question: '( )ㄇㄧˇ 飯' }, { char: '團', question: '湯( )ㄊㄨㄢˊ' }, { char: '粉', question: '麵( )ㄈㄣˇ' },
+        { char: '盯', question: '( )ㄉㄧㄥ 著' }, { char: '米', question: '( )ㄇㄧˇ 飯' }, { char: '團', question: '( )ㄊㄨㄢˊ 結' }, { char: '粉', question: '麵( )ㄈㄣˇ' },
         { char: '南', question: '( )ㄋㄢˊ 瓜' }, { char: '黃', question: '( )ㄏㄨㄤˊ 色' }, { char: '真', question: '天( )ㄓㄣ' }, { char: '呵', question: '笑( )ㄏㄜ' },
         { char: '接', question: '( )ㄐㄧㄝ 受' }, { char: '牛', question: '( )ㄋㄧㄡˊ 肉' }
     ],
@@ -352,7 +352,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     ],
     
     // =========================================================================
-    // 南一 (Nanyi) - Grade 3 (ADDED)
+    // 南一 (Nanyi) - Grade 3
     // =========================================================================
     'NY_3_1': [
         { char: '泥', question: '爛( )ㄋㄧˊ' }, { char: '化', question: '變( )ㄏㄨㄚˋ' }, { char: '雀', question: '麻( )ㄑㄩㄝˋ' }, { char: '輕', question: '年( )ㄑㄧㄥ' },
@@ -368,13 +368,13 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     ],
     'NY_3_3': [
         { char: '短', question: '長( )ㄉㄨㄢˇ' }, { char: '鐘', question: '時( )ㄓㄨㄥ' }, { char: '鬼', question: '( )ㄍㄨㄟˇ 臉' }, { char: '鬧', question: '熱( )ㄋㄠˋ' },
-        { char: '準', question: '( )ㄓㄨㄣˇ 備' }, { char: '朝', question: '( )ㄔㄠˊ 氣' }, { char: '蹈', question: '舞( )ㄉㄠˋ' }, { char: '表', question: '( )ㄅㄧㄠˇ 演' },
+        { char: '準', question: '( )ㄓㄨㄣˇ 備' }, { char: '朝', question: '( )ㄓㄠ 氣' }, { char: '蹈', question: '舞( )ㄉㄠˋ' }, { char: '表', question: '( )ㄅㄧㄠˇ 演' },
         { char: '暢', question: '舒( )ㄔㄤˋ' }, { char: '無', question: '( )ㄨˊ 聊' }, { char: '總', question: '( )ㄗㄨㄥˇ 是' }, { char: '響', question: '影( )ㄒㄧㄤˇ' },
         { char: '忘', question: '( )ㄨㄤˋ 記' }, { char: '盡', question: '( )ㄐㄧㄣˋ 力' }, { char: '責', question: '( )ㄗㄜˊ 任' }
     ],
     'NY_3_4': [
-        { char: '指', question: '( )ㄓˇ 頭' }, { char: '夕', question: '( )ㄒㄧ 陽' }, { char: '賽', question: '比( )ㄙㄞˋ' }, { char: '緊', question: '( )ㄐㄧㄣˇ 張' },
-        { char: '店', question: '商( )ㄉㄧㄢˋ' }, { char: '逗', question: '( )ㄉㄡˋ 留' }, { char: '轉', question: '( )ㄓㄨㄢˇ 彎' }, { char: '露', question: '( )ㄌㄨˋ 出' },
+        { char: '指', question: '( )ㄓˇ 頭' }, { char: '夕', question: '( )ㄒㄧˋ 陽' }, { char: '賽', question: '比( )ㄙㄞˋ' }, { char: '緊', question: '( )ㄐㄧㄣˇ 張' },
+        { char: '店', question: '商( )ㄉㄧㄢˋ' }, { char: '逗', question: '( )ㄉㄡˋ 留' }, { char: '轉', question: '( )ㄓㄨㄢˇ 彎' }, { char: '露', question: '( )ㄌㄡˋ 出' },
         { char: '業', question: '作( )ㄧㄝˋ' }, { char: '專', question: '( )ㄓㄨㄢ 心' }, { char: '勝', question: '( )ㄕㄥˋ 利' }, { char: '利', question: '便( )ㄌㄧˋ' },
         { char: '悅', question: '喜( )ㄩㄝˋ' }, { char: '乖', question: '( )ㄍㄨㄞ 巧' }, { char: '溫', question: '( )ㄨㄣ 暖' }
     ],
@@ -391,7 +391,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '題', question: '問( )ㄊㄧˊ' }, { char: '灰', question: '( )ㄏㄨㄟ 色' }, { char: '剪', question: '( )ㄐㄧㄢˇ 刀' }
     ],
     'NY_3_7': [
-        { char: '背', question: '( )ㄅㄟˋ 包' }, { char: '斑', question: '( )ㄅㄢ 馬' }, { char: '皺', question: '( )ㄓㄡˋ 紋' }, { char: '懂', question: '( )ㄉㄨㄥˇ 得' },
+        { char: '背', question: '( )ㄅㄟ 包' }, { char: '斑', question: '( )ㄅㄢ 馬' }, { char: '皺', question: '( )ㄓㄡˋ 紋' }, { char: '懂', question: '( )ㄉㄨㄥˇ 得' },
         { char: '凡', question: '平( )ㄈㄢˊ' }, { char: '梳', question: '( )ㄕㄨ 頭' }, { char: '夾', question: '( )ㄐㄧㄚˊ 子' }, { char: '藏', question: '躲( )ㄘㄤˊ' },
         { char: '捏', question: '( )ㄋㄧㄝ 麵人' }, { char: '摺', question: '( )ㄓㄜˊ 紙' }, { char: '仔', question: '( )ㄗˇ 細' }, { char: '藝', question: '( )ㄧˋ 術' },
         { char: '術', question: '美( )ㄕㄨˋ' }, { char: '雖', question: '( )ㄙㄨㄟ 然' }, { char: '創', question: '( )ㄔㄨㄤˋ 作' }
@@ -433,13 +433,13 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'HL_1_1': [
         { char: '起', question: '( )ㄑㄧˇ 立' }, { char: '走', question: '( )ㄗㄡˇ 路' }, { char: '你', question: '( )ㄋㄧˇ 好' }, 
         { char: '在', question: '現( )ㄗㄞˋ' }, { char: '左', question: '( )ㄗㄨㄛˇ 邊' }, { char: '我', question: '( )ㄨㄛˇ 們' }, 
-        { char: '右', question: '( )ㄧㄡˋ 手' }, { char: '和', question: '( )ㄏㄢˋ 平' }, { char: '向', question: '方( )ㄒㄧㄤˋ' }, 
+        { char: '右', question: '( )ㄧㄡˋ 手' }, { char: '和', question: '( )ㄏㄜˊ 平' }, { char: '向', question: '方( )ㄒㄧㄤˋ' }, 
         { char: '前', question: '( )ㄑㄧㄢˊ 面' }
     ],
     'HL_1_2': [
         { char: '大', question: '( )ㄉㄚˋ 象' }, { char: '風', question: '颳( )ㄈㄥ' }, { char: '吹', question: '( )ㄔㄨㄟ 氣' }, 
         { char: '們', question: '他( )ㄇㄣ˙' }, { char: '來', question: '( )ㄌㄞˊ 去' }, { char: '玩', question: '( )ㄨㄢˊ 具' }, 
-        { char: '不', question: '( )ㄅㄨˋ 是' }, { char: '停', question: '( )ㄊㄧㄥˊ 車' }, { char: '的', question: '好( )ㄉㄜ˙' }, 
+        { char: '不', question: '( )ㄅㄨˊ 是' }, { char: '停', question: '( )ㄊㄧㄥˊ 車' }, { char: '的', question: '好( )ㄉㄜ˙' }, 
         { char: '跑', question: '( )ㄆㄠˇ 步' }
     ],
     'HL_1_3': [
@@ -452,7 +452,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '請', question: '( )ㄑㄧㄥˇ 問' }, { char: '問', question: '學( )ㄨㄣˋ' }, { char: '草', question: '( )ㄘㄠˇ 地' }, 
         { char: '天', question: '( )ㄊㄧㄢ 空' }, { char: '有', question: '沒( )ㄧㄡˇ' }, { char: '多', question: '許( )ㄉㄨㄛ' }, 
         { char: '高', question: '( )ㄍㄠ 興' }, { char: '星', question: '( )ㄒㄧㄥ 星' }, { char: '少', question: '減( )ㄕㄠˇ' }, 
-        { char: '太', question: '( )ㄊㄞài 陽' }, { char: '了', question: '走( )ㄌㄜ˙' }, { char: '水', question: '喝( )ㄕㄨㄟˇ' }, 
+        { char: '太', question: '( )ㄊㄞˋ 陽' }, { char: '了', question: '走( )ㄌㄜ˙' }, { char: '水', question: '喝( )ㄕㄨㄟˇ' }, 
         { char: '去', question: '過( )ㄑㄩˋ' }
     ],
     'HL_1_5': [
@@ -470,7 +470,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'HL_1_7': [
         { char: '回', question: '( )ㄏㄨㄟˊ 家' }, { char: '音', question: '聲( )ㄧㄣ' }, { char: '到', question: '來( )ㄉㄠˋ' }, 
         { char: '谷', question: '山( )ㄍㄨˇ' }, { char: '叫', question: '尖( )ㄐㄧㄠˋ' }, { char: '人', question: '大( )ㄖㄣˊ' }, 
-        { char: '嗎', question: '好( )ㄇㄚ˙' }, { char: '也', question: '( )ㄧㄝˇ 是' }, { char: '笑', question: '微( )ㄒㄧㄠˋ' }, 
+        { char: '嗎', question: '好( )ㄇㄚ ' }, { char: '也', question: '( )ㄧㄝˇ 是' }, { char: '笑', question: '微( )ㄒㄧㄠˋ' }, 
         { char: '哈', question: '( )ㄏㄚ 哈' }
     ],
 
@@ -499,7 +499,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '分', question: '( )ㄈㄣ 享' }, { char: '享', question: '分( )ㄒㄧㄤˇ' }
     ],
     'HL_2_4': [
-        { char: '呱', question: '頂( )ㄍㄨㄚ' }, { char: '聞', question: '新( )ㄨㄣˊ' }, { char: '聲', question: '( )ㄕㄥ 音' }, { char: '猜', question: '( )ㄘㄞ 謎' },
+        { char: '呱', question: '頂( )ㄍㄨㄚ呱' }, { char: '聞', question: '新( )ㄨㄣˊ' }, { char: '聲', question: '( )ㄕㄥ 音' }, { char: '猜', question: '( )ㄘㄞ 謎' },
         { char: '蛙', question: '青( )ㄨㄚ' }, { char: '別', question: '( )ㄅㄧㄝˊ 人' }, { char: '靠', question: '依( )ㄎㄠˋ' }, { char: '近', question: '遠( )ㄐㄧㄣˋ' },
         { char: '抓', question: '( )ㄓㄨㄚ 住' }, { char: '如', question: '( )ㄖㄨˊ 果' }, { char: '果', question: '水( )ㄍㄨㄛˇ' }, { char: '乖', question: '( )ㄍㄨㄞ 巧' },
         { char: '腦', question: '電( )ㄋㄠˇ' }, { char: '袋', question: '口( )ㄉㄞˋ' }, { char: '瓜', question: '西( )ㄍㄨㄚ' }, { char: '證', question: '( )ㄓㄥˋ 明' },
@@ -508,7 +508,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'HL_2_5': [
         { char: '沙', question: '( )ㄕㄚ 灘' }, { char: '灘', question: '海( )ㄊㄢ' }, { char: '海', question: '( )ㄏㄞˇ 邊' }, { char: '邊', question: '旁( )ㄅㄧㄢ' },
         { char: '退', question: '後( )ㄊㄨㄟˋ' }, { char: '遠', question: '遙( )ㄩㄢˇ' }, { char: '螃', question: '( )ㄆㄤˊ 蟹' }, { char: '蟹', question: '螃( )ㄒㄧㄝˋ' },
-        { char: '愛', question: '可( )ㄞˋ' }, { char: '注', question: '( )ㄓㄨˋ 意' }, { char: '夕', question: '( )ㄒㄧ 陽' }, { char: '腳', question: '( )ㄐㄧㄠˇ 步' },
+        { char: '愛', question: '可( )ㄞˋ' }, { char: '注', question: '( )ㄓㄨˋ 意' }, { char: '夕', question: '( )ㄒㄧˋ 陽' }, { char: '腳', question: '( )ㄐㄧㄠˇ 步' },
         { char: '丫', question: '腳( )ㄧㄚ' }, { char: '橫', question: '( )ㄏㄥˊ 線' }, { char: '留', question: '( )ㄌㄧㄡˊ 下' }, { char: '印', question: '( )ㄧㄣˋ 章' },
         { char: '挖', question: '( )ㄨㄚ 土' }, { char: '麗', question: '美( )ㄌㄧˋ' }
     ],
@@ -551,19 +551,19 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '怪', question: '奇( )ㄍㄨㄞˋ' }, { char: '門', question: '大( )ㄇㄣˊ' }, { char: '扇', question: '電風( )ㄕㄢˋ' }, { char: '立', question: '站( )ㄌㄧˋ' },
         { char: '刻', question: '雕( )ㄎㄜˋ' }, { char: '閒', question: '( )ㄒㄧㄢˊ 暇' }, { char: '馬', question: '( )ㄇㄚˇ 上' }, { char: '闖', question: '( )ㄔㄨㄤˇ 關' },
         { char: '耳', question: '( )ㄦˇ 朵' }, { char: '主', question: '( )ㄓㄨˇ 人' }, { char: '播', question: '傳( )ㄅㄛˋ' }, { char: '報', question: '( )ㄅㄠˋ 紙' },
-        { char: '力', question: '努( )ㄌㄧˋ' }, { char: '竟', question: '畢( )ㄐㄧㄥˋ' }, { char: '巴', question: '尾( )ㄅㄚ' }, { char: '東', question: '( )ㄉㄨㄥ 西' },
+        { char: '力', question: '努( )ㄌㄧˋ' }, { char: '竟', question: '畢( )ㄐㄧㄥˋ' }, { char: '巴', question: '尾( )ㄅㄚ˙' }, { char: '東', question: '( )ㄉㄨㄥ 西' },
         { char: '西', question: '東( )ㄒㄧ' }, { char: '底', question: '海( )ㄉㄧˇ' }
     ],
     'HL_2_12': [
-        { char: '念', question: '思( )ㄋㄧㄢˋ' }, { char: '曲', question: '歌( )ㄑㄩˇ' }, { char: '項', question: '頸( )ㄒㄧㄤˋ' }, { char: '浮', question: '( )ㄈㄨˊ 沉' },
-        { char: '掌', question: '手( )ㄓㄤˇ' }, { char: '撥', question: '( )ㄅㄛ 開' }, { char: '波', question: '( )ㄅㄛ 浪' }, { char: '詩', question: '( )ㄕ 歌' },
+        { char: '思', question: '思( )ㄋㄧㄢˋ' }, { char: '歌', question: '歌( )ㄑㄩˇ' }, { char: '品', question: '品( )ㄒㄧㄤˋ' }, { char: '浮', question: '( )ㄈㄨˊ 沉' },
+        { char: '手', question: '手( )ㄓㄤˇ' }, { char: '撥', question: '( )ㄅㄛ 開' }, { char: '波', question: '( )ㄅㄛ 浪' }, { char: '詩', question: '( )ㄕ 歌' },
         { char: '作', question: '( )ㄗㄨㄛˋ 業' }, { char: '首', question: '一( )ㄕㄡˇ' }, { char: '指', question: '( )ㄓˇ 頭' }, { char: '伸', question: '( )ㄕㄣ 手' },
         { char: '脖', question: '( )ㄅㄛˊ 子' }, { char: '身', question: '( )ㄕㄣ 體' }, { char: '體', question: '育( )ㄊㄧˇ' }, { char: '隻', question: '一( )ㄓ' },
         { char: '倒', question: '( )ㄉㄠˋ 車' }, { char: '肚', question: '( )ㄉㄨˋ 子' }
     ],
 
     // =========================================================================
-    // 翰林 (Hanlin) - Grade 3 (Existing)
+    // 翰林 (Hanlin) - Grade 3
     // =========================================================================
     'HL_3_1': [
         { char: '待', question: '等( )ㄉㄞˋ' }, { char: '牠', question: '( )ㄊㄚ 們(動物)' }, { char: '吞', question: '( )ㄊㄨㄣ 嚥' }, { char: '寸', question: '一( )ㄘㄨㄣˋ' },
@@ -599,7 +599,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '黏', question: '( )ㄋㄧㄢˊ 貼' }, { char: '木', question: '( )ㄇㄨˋ 頭' }, { char: '製', question: '( )ㄓˋ 造' }, { char: '部', question: '( )ㄅㄨˋ 分' },
         { char: '混', question: '( )ㄏㄨㄣˋ 合' }, { char: '斷', question: '折( )ㄉㄨㄢˋ' }, { char: '解', question: '( )ㄐㄧㄝˇ 釋' }, { char: '機', question: '飛( )ㄐㄧ' },
         { char: '器', question: '機( )ㄑㄧˋ' }, { char: '另', question: '( )ㄌㄧㄥˋ 外' }, { char: '治', question: '( )ㄓˋ 療' }, { char: '枝', question: '樹( )ㄓ' },
-        { char: '桿', question: '旗( )ㄍㄢˇ' }, { char: '擦', question: '( )ㄘㄚ 掉' }, { char: '削', question: '( )ㄒㄧㄠ 鉛筆' }
+        { char: '桿', question: '旗( )ㄍㄢ' }, { char: '擦', question: '( )ㄘㄚ 掉' }, { char: '削', question: '( )ㄒㄧㄠ 鉛筆' }
     ],
     'HL_3_7': [
         { char: '鹹', question: '( )ㄒㄧㄢˊ 味' }, { char: '蔚', question: '( )ㄨㄟˋ 藍' }, { char: '航', question: '( )ㄏㄤˊ 行' }, { char: '乘', question: '( )ㄔㄥˊ 客' },

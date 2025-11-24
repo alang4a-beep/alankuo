@@ -1,9 +1,4 @@
 
-
-
-
-
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -11,7 +6,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal, Baby, PauseCircle, Home, RotateCcw } from 'lucide-react';
+import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal, Baby, PauseCircle, Home, RotateCcw, Percent } from 'lucide-react';
 import { useStore } from '../../store';
 import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty, PetID } from '../../types';
 import { audio } from '../System/Audio';
@@ -119,7 +114,7 @@ const SHOP_ITEMS: ShopItem[] = [
 ];
 
 const ShopScreen: React.FC = () => {
-    const { score, buyItem, closeShop, hasDoubleJump, hasImmortality, hasFireball, hasFlight, hasPassiveHeal, hasGemDoubler, hasMagnet, ownedPets, activePets, togglePet } = useStore();
+    const { score, buyItem, closeShop, hasDoubleJump, hasImmortality, hasFireball, hasFlight, hasPassiveHeal, hasGemDoubler, hasMagnet, ownedPets, activePets, togglePet, lives, maxLives } = useStore();
 
     const isOwned = (item: ShopItem) => {
         if (item.petId) return ownedPets.includes(item.petId);
@@ -139,10 +134,22 @@ const ShopScreen: React.FC = () => {
         <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-md overflow-y-auto custom-scrollbar">
              <div className="flex flex-col items-center justify-start min-h-full py-8 px-4">
                  <h2 className="text-3xl md:text-4xl font-black text-cyan-400 mb-2 font-cyber tracking-widest text-center">虛擬商店</h2>
-                 <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-xl px-6 py-2 rounded-full border border-yellow-500/30 flex items-center text-yellow-400 mb-6 shadow-[0_0_15px_rgba(255,215,0,0.2)]">
-                     <span className="text-base md:text-lg mr-2 font-bold">目前寶石:</span>
-                     <Diamond className="w-5 h-5 mr-1 fill-yellow-400" />
-                     <span className="text-xl md:text-2xl font-black font-mono">{score.toLocaleString()}</span>
+                 
+                 {/* Shop Status Bar: Gems + HP */}
+                 <div className="sticky top-0 z-10 bg-black/80 backdrop-blur-xl px-6 py-2 rounded-full border border-gray-700 flex items-center justify-between gap-6 text-white mb-6 shadow-[0_0_15px_rgba(0,255,255,0.1)] min-w-[300px]">
+                     <div className="flex items-center text-yellow-400">
+                         <Diamond className="w-5 h-5 mr-2 fill-yellow-400" />
+                         <span className="text-xl md:text-2xl font-black font-mono">{score.toLocaleString()}</span>
+                     </div>
+                     <div className="w-px h-6 bg-gray-600"></div>
+                     <div className="flex items-center space-x-1">
+                        {[...Array(maxLives)].map((_, i) => (
+                            <Heart 
+                                key={i} 
+                                className={`w-5 h-5 ${i < lives ? 'text-pink-500 fill-pink-500' : 'text-gray-600 fill-gray-600'}`} 
+                            />
+                        ))}
+                     </div>
                  </div>
 
                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl w-full mb-8">
@@ -211,29 +218,29 @@ const ShopScreen: React.FC = () => {
     );
 };
 
-// ... [WrongAnswerReview, MobileControls remain same] ...
 const WrongAnswerReview: React.FC = () => {
     const { wrongAnswers } = useStore();
     if (wrongAnswers.length === 0) return null;
 
     return (
-        <div className="w-full max-w-2xl mt-6 bg-red-900/20 border border-red-500/50 rounded-xl p-4 overflow-hidden">
-             <div className="flex items-center text-red-400 mb-2 font-bold">
-                 <AlertCircle className="w-5 h-5 mr-2" />
-                 <span>答錯題目複習</span>
+        <div className="w-full max-w-4xl mt-6 bg-red-900/30 border border-red-500/50 rounded-2xl p-6 overflow-hidden shadow-[0_0_30px_rgba(255,0,0,0.2)]">
+             <div className="flex items-center text-red-300 mb-4 font-black text-xl md:text-2xl border-b border-red-500/30 pb-2">
+                 <AlertCircle className="w-6 h-6 mr-3" />
+                 <span>答錯題目複習 ({wrongAnswers.length}題)</span>
              </div>
-             <div className="max-h-48 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+             <div className="max-h-[50vh] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
                  {wrongAnswers.map((item, idx) => (
-                     <div key={idx} className="bg-black/40 p-3 rounded flex justify-between items-center text-sm">
-                         <div className="text-gray-300 font-serif text-lg">{item.question}</div>
-                         <div className="flex items-center space-x-4">
+                     <div key={idx} className="bg-black/60 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 border border-red-500/20">
+                         <div className="text-white font-serif text-2xl md:text-3xl font-bold">{item.question}</div>
+                         <div className="flex items-center space-x-8 bg-gray-900/50 px-6 py-2 rounded-lg">
                              <div className="flex flex-col items-center">
-                                 <span className="text-xs text-red-500">您的答案</span>
-                                 <span className="text-xl font-bold text-red-400">{item.playerChar}</span>
+                                 <span className="text-xs text-red-400 mb-1">您的答案</span>
+                                 <span className="text-3xl font-black text-red-500 line-through opacity-70">{item.playerChar}</span>
                              </div>
+                             <div className="w-px h-10 bg-gray-600"></div>
                              <div className="flex flex-col items-center">
-                                 <span className="text-xs text-green-500">正確答案</span>
-                                 <span className="text-xl font-bold text-green-400">{item.correctChar}</span>
+                                 <span className="text-xs text-green-400 mb-1">正確答案</span>
+                                 <span className="text-4xl font-black text-green-400 drop-shadow-[0_0_10px_lime]">{item.correctChar}</span>
                              </div>
                          </div>
                      </div>
@@ -381,7 +388,8 @@ export const HUD: React.FC = () => {
     difficulty, setDifficulty,
     ttsEnabled, setTtsEnabled,
     devMode, toggleDevMode,
-    returnToMenu
+    returnToMenu,
+    wrongAnswers
   } = useStore();
 
   const [imageError, setImageError] = useState(false);
@@ -409,6 +417,10 @@ export const HUD: React.FC = () => {
   const effectiveSpeed = speed * speedMultiplier;
   const speedPercent = Math.round((effectiveSpeed / RUN_SPEED_BASE) * 100);
 
+  // Calculate Accuracy for End Screens
+  const totalAttempts = totalCorrectAnswers + wrongAnswers.length;
+  const accuracy = totalAttempts > 0 ? Math.round((totalCorrectAnswers / totalAttempts) * 100) : 0;
+
   if (status === GameStatus.SHOP) {
       return <ShopScreen />;
   }
@@ -418,9 +430,6 @@ export const HUD: React.FC = () => {
   }
 
   if (status === GameStatus.MENU) {
-      // ... (Menu Content - Removed for brevity, identical to previous)
-      // I will copy-paste the menu content back to ensure no code loss, 
-      // but using "..." here in thought process.
       const canStart = selectedLessonIds.length > 0;
 
       return (
@@ -665,7 +674,6 @@ export const HUD: React.FC = () => {
       );
   }
 
-  // ... (Game Over and Victory Screens - No Changes needed, omitting for brevity but assume they are here)
   if (status === GameStatus.GAME_OVER) {
        return (
           <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-sm overflow-y-auto custom-scrollbar">
@@ -676,6 +684,10 @@ export const HUD: React.FC = () => {
                     <div className="bg-gray-900/80 p-3 md:p-4 rounded-lg border border-gray-700 flex items-center justify-between">
                         <div className="flex items-center text-yellow-400 text-sm md:text-base"><Trophy className="mr-2 w-4 h-4 md:w-5 md:h-5"/> 答題進度</div>
                         <div className="text-xl md:text-2xl font-bold font-mono">{totalCorrectAnswers} / {victoryTarget}</div>
+                    </div>
+                    <div className="bg-gray-900/80 p-3 md:p-4 rounded-lg border border-gray-700 flex items-center justify-between">
+                        <div className="flex items-center text-green-400 text-sm md:text-base"><Percent className="mr-2 w-4 h-4 md:w-5 md:h-5"/> 正確率</div>
+                        <div className="text-xl md:text-2xl font-bold font-mono">{accuracy}%</div>
                     </div>
                      <div className="bg-gray-800/50 p-3 md:p-4 rounded-lg flex items-center justify-between mt-2">
                         <div className="flex items-center text-white text-sm md:text-base">得分</div>
@@ -715,6 +727,11 @@ export const HUD: React.FC = () => {
                 
                 <div className="grid grid-cols-1 gap-4 text-center mb-8 w-full max-w-md">
                     <div className="bg-black/60 p-6 rounded-xl border border-yellow-500/30 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+                        <div className="flex justify-between items-center mb-4">
+                            <div className="text-sm text-gray-400">正確率</div>
+                            <div className="text-2xl font-bold text-green-400">{accuracy}%</div>
+                        </div>
+                        <div className="w-full h-px bg-gray-700 mb-4"></div>
                         <div className="text-xs md:text-sm text-gray-400 mb-1 tracking-wider">最終得分</div>
                         <div className="text-3xl md:text-4xl font-bold font-cyber text-yellow-400">{score.toLocaleString()}</div>
                     </div>
