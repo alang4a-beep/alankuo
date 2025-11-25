@@ -6,7 +6,6 @@ import { GameStatus, RUN_SPEED_BASE, VocabItem, WrongAnswer, Difficulty, PetID, 
 
 // IDs format: PUBLISHER_GRADE_LESSON (e.g., KX_1_1, HL_3_12)
 export const LESSON_DATA: Record<string, VocabItem[]> = {
-    // ... (Previous lesson data remains here, omitted for brevity as it is very large. Assume it is preserved)
     // =========================================================================
     // 康軒 (Kangxuan) - Grade 1
     // =========================================================================
@@ -49,6 +48,10 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '朵', question: '花( )ㄉㄨㄛ˙' }, { char: '從', question: '( )ㄘㄨㄥˊ 前' }, { char: '頭', question: '( )ㄊㄡˊ 髮' }, 
         { char: '那', question: '( )ㄋㄚˋ 裡' }
     ],
+    
+    // =========================================================================
+    // 康軒 (Kangxuan) - Grade 2
+    // =========================================================================
     'KX_2_1': [
         { char: '年', question: '新( )ㄋㄧㄢˊ' }, { char: '希', question: '( )ㄒㄧ 望' }, { char: '望', question: '願( )ㄨㄤˋ' }, { char: '坐', question: '( )ㄗㄨㄛˇ 下' },
         { char: '位', question: '座( )ㄨㄟˋ' }, { char: '本', question: '課( )ㄅㄣˇ' }, { char: '淡', question: '平( )ㄉㄢˋ' }, { char: '書', question: '讀( )ㄕㄨ' },
@@ -214,46 +217,39 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     // 南一 (Nanyi) - Grade 1
     // =========================================================================
     'NY_1_1': [
-        { char: '小', question: '( )ㄒㄧㄠˇ 狗' }, { char: '上', question: '樓( )ㄕㄤˋ' }, { char: '走', question: '( )ㄗㄡˇ 路' }, 
-        { char: '左', question: '( )ㄗㄨㄛˇ 右' }, { char: '右', question: '左( )ㄧㄡˋ' }, { char: '向', question: '方( )ㄒㄧㄤˋ' }, 
-        { char: '魚', question: '( )ㄩˊ 兒' }, { char: '也', question: '( )ㄧㄝˇ 許' }, { char: '來', question: '( )ㄌㄞˊ 去' }, 
-        { char: '加', question: '( )ㄐㄧㄚ 油' }
+        { char: '小', question: '( )ㄒㄧㄠˇ 狗' }, { char: '上', question: '樓( )ㄕㄤˋ' }, { char: '走', question: '( )ㄗㄡˇ 路' }, { char: '左', question: '( )ㄗㄨㄛˇ 右' }, 
+        { char: '右', question: '左( )ㄧㄡˋ' }, { char: '向', question: '方( )ㄒㄧㄤˋ' }, { char: '魚', question: '( )ㄩˊ 兒' }, { char: '也', question: '( )ㄧㄝˇ 許' }, 
+        { char: '來', question: '( )ㄌㄞˊ 去' }, { char: '加', question: '( )ㄐㄧㄚ 油' }
     ],
     'NY_1_2': [
-        { char: '開', question: '( )ㄎㄞ 車' }, { char: '出', question: '( )ㄔㄨ 去' }, { char: '招', question: '( )ㄓㄠ 手' }, 
-        { char: '車', question: '汽( )ㄔㄜ' }, { char: '子', question: '椅( )ㄗ˙' }, { char: '地', question: '土( )ㄉㄧˋ' }, 
-        { char: '花', question: '( )ㄏㄨㄚ 園' }, { char: '朵', question: '耳( )ㄉㄨㄛ˙' }, { char: '在', question: '正( )ㄗㄞˋ' }, 
-        { char: '笑', question: '微( )ㄒㄧㄠˋ' }
+        { char: '開', question: '( )ㄎㄞ 車' }, { char: '出', question: '( )ㄔㄨ 去' }, { char: '招', question: '( )ㄓㄠ 手' }, { char: '車', question: '汽( )ㄔㄜ' }, 
+        { char: '子', question: '椅( )ㄗ˙' }, { char: '地', question: '土( )ㄉㄧˋ' }, { char: '花', question: '( )ㄏㄨㄚ 園' }, { char: '朵', question: '耳( )ㄉㄨㄛ˙' }, 
+        { char: '在', question: '正( )ㄗㄞˋ' }, { char: '笑', question: '微( )ㄒㄧㄠˋ' }
     ],
     'NY_1_3': [
-        { char: '泡', question: '( )ㄆㄠˋ 泡' }, { char: '玩', question: '好( )ㄨㄢˊ' }, { char: '大', question: '( )ㄉㄚˋ 家' }, 
-        { char: '起', question: '( )ㄑㄧˇ 床' }, { char: '好', question: '( )ㄏㄠˇ 看' }, { char: '多', question: '許( )ㄉㄨㄛ' }, 
-        { char: '我', question: '( )ㄨㄛˇ 的' }, { char: '的', question: '你( )ㄉㄜ˙' }, { char: '你', question: '祝( )ㄋㄧˇ' }, 
-        { char: '抱', question: '( )ㄅㄠˋ 抱' }
+        { char: '泡', question: '( )ㄆㄠˋ 泡' }, { char: '玩', question: '好( )ㄨㄢˊ' }, { char: '大', question: '( )ㄉㄚˋ 家' }, { char: '起', question: '( )ㄑㄧˇ 床' }, 
+        { char: '好', question: '( )ㄏㄠˇ 看' }, { char: '多', question: '許( )ㄉㄨㄛ' }, { char: '我', question: '( )ㄨㄛˇ 的' }, { char: '的', question: '你( )ㄉㄜ˙' }, 
+        { char: '你', question: '祝( )ㄋㄧˇ' }, { char: '抱', question: '( )ㄅㄠˋ 抱' }
     ],
     'NY_1_4': [
-        { char: '爸', question: '( )ㄅㄚˋ 爸' }, { char: '到', question: '遲( )ㄉㄠˋ' }, { char: '青', question: '( )ㄑㄧㄥ 山' }, 
-        { char: '叫', question: '( )ㄐㄧㄠˋ 喊' }, { char: '下', question: '樓( )ㄒㄧㄚˋ' }, { char: '那', question: '( )ㄋㄚˋ 邊' }, 
-        { char: '和', question: '我( )ㄏㄢˋ 你' }, { char: '要', question: '想( )ㄧㄠˋ' }, { char: '他', question: '( )ㄊㄚ 人' }, 
-        { char: '朋', question: '( )ㄆㄥˊ 友' }, { char: '友', question: '朋( )ㄧㄡˇ' }
+        { char: '爸', question: '( )ㄅㄚˋ 爸' }, { char: '到', question: '遲( )ㄉㄠˋ' }, { char: '青', question: '( )ㄑㄧㄥ 山' }, { char: '叫', question: '( )ㄐㄧㄠˋ 喊' }, 
+        { char: '下', question: '樓( )ㄒㄧㄚˋ' }, { char: '那', question: '( )ㄋㄚˋ 邊' }, { char: '和', question: '我( )ㄏㄢˋ 你' }, { char: '要', question: '想( )ㄧㄠˋ' }, 
+        { char: '他', question: '( )ㄊㄚ 人' }, { char: '朋', question: '( )ㄆㄥˊ 友' }, { char: '友', question: '朋( )ㄧㄡˇ' }
     ],
     'NY_1_5': [
-        { char: '外', question: '( )ㄨㄞˋ 頭' }, { char: '住', question: '居( )ㄓㄨˋ' }, { char: '個', question: '一( )ㄍㄜ˙' }, 
-        { char: '們', question: '它( )ㄇㄣ˙' }, { char: '這', question: '( )ㄓㄜˋ 個' }, { char: '裡', question: '家( )ㄌㄧˇ' }, 
-        { char: '有', question: '沒( )ㄧㄡˇ' }, { char: '沒', question: '( )ㄇㄟˊ 有' }, { char: '是', question: '都( )ㄕˋ' }, 
-        { char: '什', question: '( )ㄕㄣˊ 麼' }, { char: '麼', question: '什( )ㄇㄜ˙' }
+        { char: '外', question: '( )ㄨㄞˋ 頭' }, { char: '住', question: '居( )ㄓㄨˋ' }, { char: '個', question: '一( )ㄍㄜ˙' }, { char: '們', question: '它( )ㄇㄣ˙' }, 
+        { char: '這', question: '( )ㄓㄜˋ 個' }, { char: '裡', question: '家( )ㄌㄧˇ' }, { char: '有', question: '沒( )ㄧㄡˇ' }, { char: '沒', question: '( )ㄇㄟˊ 有' }, 
+        { char: '是', question: '都( )ㄕˋ' }, { char: '什', question: '( )ㄕㄣˊ 麼' }, { char: '麼', question: '什( )ㄇㄜ˙' }
     ],
     'NY_1_6': [
-        { char: '金', question: '( )ㄐㄧㄣ 魚' }, { char: '說', question: '( )ㄕㄨㄛ 話' }, { char: '句', question: '造( )ㄐㄩˋ' }, 
-        { char: '話', question: '笑( )ㄏㄨㄚˋ' }, { char: '兩', question: '( )ㄌㄧㄤˇ 隻' }, { char: '都', question: '( )ㄉㄡ 是' }, 
-        { char: '悄', question: '( )ㄑㄧㄠˇ 悄' }, { char: '尾', question: '( )ㄨㄟˇ 巴' }, { char: '巴', question: '尾( )ㄅㄚ˙' }, 
-        { char: '滿', question: '( )ㄇㄢˇ 意' }, { char: '紅', question: '( )ㄏㄨㄥˊ 色' }
+        { char: '金', question: '( )ㄐㄧㄣ 魚' }, { char: '說', question: '( )ㄕㄨㄛ 話' }, { char: '句', question: '造( )ㄐㄩˋ' }, { char: '話', question: '笑( )ㄏㄨㄚˋ' }, 
+        { char: '兩', question: '( )ㄌㄧㄤˇ 隻' }, { char: '都', question: '( )ㄉㄡ 是' }, { char: '悄', question: '( )ㄑㄧㄠˇ 悄' }, { char: '尾', question: '( )ㄨㄟˇ 巴' }, 
+        { char: '巴', question: '尾( )ㄅㄚ˙' }, { char: '滿', question: '( )ㄇㄢˇ 意' }, { char: '紅', question: '( )ㄏㄨㄥˊ 色' }
     ],
     'NY_1_7': [
-        { char: '春', question: '( )ㄔㄨㄣ 節' }, { char: '貼', question: '( )ㄊㄧㄝ 紙' }, { char: '呢', question: '你( )ㄋㄜ ' }, 
-        { char: '了', question: '好( )ㄌㄜ˙' }, { char: '請', question: '( )ㄑㄧㄥˇ 客' }, { char: '天', question: '( )ㄊㄧㄢ 氣' }, 
-        { char: '家', question: '回( )ㄐㄧㄚ' }, { char: '把', question: '門( )ㄅㄚˇ' }, { char: '不', question: '( )ㄅㄨˊ 要' }, 
-        { char: '房', question: '( )ㄈㄤˊ 子' }, { char: '福', question: '幸( )ㄈㄨˊ' }
+        { char: '春', question: '( )ㄔㄨㄣ 節' }, { char: '貼', question: '( )ㄊㄧㄝ 紙' }, { char: '呢', question: '你( )ㄋㄜ' }, { char: '了', question: '好( )ㄌㄜ˙' }, 
+        { char: '請', question: '( )ㄑㄧㄥˇ 客' }, { char: '天', question: '( )ㄊㄧㄢ 氣' }, { char: '家', question: '回( )ㄐㄧㄚ' }, { char: '把', question: '門( )ㄅㄚˇ' }, 
+        { char: '不', question: '( )ㄅㄨˊ 要' }, { char: '房', question: '( )ㄈㄤˊ 子' }, { char: '福', question: '幸( )ㄈㄨˊ' }
     ],
 
     // =========================================================================
@@ -288,11 +284,11 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '戲', question: '遊( )ㄒㄧˋ' }, { char: '剩', question: '( )ㄕㄥˋ 下' }
     ],
     'NY_2_5': [
-        { char: '蟲', question: '毛毛( )ㄔㄨㄥˊ' }, { char: '森', question: '( )ㄙㄣ 林' }, { char: '動', question: '( )ㄉㄨㄥˋ 物' }, { char: '物', question: '人( )ㄨˋ' },
-        { char: '王', question: '國( )ㄨㄤˊ' }, { char: '坐', question: '( )ㄗㄨㄛˋ 下' }, { char: '午', question: '中( )ㄨˇ' }, { char: '停', question: '( )ㄊㄧㄥˊ 車' },
-        { char: '座', question: '( )ㄗㄨㄛˋ 位' }, { char: '急', question: '著( )ㄐㄧˊ' }, { char: '百', question: 'ㄧ( )ㄅㄞˇ 分' }, { char: '科', question: '( )ㄎㄜ 學' },
-        { char: '全', question: '( )ㄑㄩㄢˊ 部' }, { char: '原', question: '草( )ㄩㄢˊ' }, { char: '從', question: '( )ㄘㄨㄥˊ 前' }, { char: '此', question: '因( )ㄘˇ' },
-        { char: '管', question: '吸( )ㄍㄨㄢˇ' }, { char: '種', question: '( )ㄓㄨㄥˋ 樹' }
+        { char: '蟲', question: '毛毛( )ㄔㄨㄥˊ' }, { char: '森', question: '( )ㄙㄣ 林' }, { char: '動', question: '( )ㄉㄨㄥˋ 物' }, { char: '王', question: '人( )ㄨˋ' },
+        { char: '坐', question: '國( )ㄨㄤˊ' }, { char: '午', question: '( )ㄗㄨㄛˋ 下' }, { char: '停', question: '中( )ㄨˇ' }, { char: '座', question: '( )ㄊㄧㄥˊ 車' },
+        { char: '急', question: '( )ㄗㄨㄛˋ 位' }, { char: '百', question: '著( )ㄐㄧˊ' }, { char: '科', question: '一( )ㄅㄞˇ 分' }, { char: '全', question: '( )ㄎㄜ 學' },
+        { char: '原', question: '( )ㄑㄩㄢˊ 部' }, { char: '從', question: '草( )ㄩㄢˊ' }, { char: '此', question: '( )ㄘㄨㄥˊ 前' }, { char: '管', question: '因( )ㄘˇ' },
+        { char: '種', question: '吸( )ㄍㄨㄢˇ' }
     ],
     'NY_2_6': [
         { char: '自', question: '( )ㄗˋ 己' }, { char: '己', question: '自( )ㄐㄧˇ' }, { char: '沙', question: '( )ㄕㄚ 發' }, { char: '撿', question: '( )ㄐㄧㄢˇ 起來' },
@@ -318,12 +314,12 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'NY_2_9': [
         { char: '赤', question: '( )ㄔˋ 腳' }, { char: '國', question: '( )ㄍㄨㄛˊ 家' }, { char: '熱', question: '( )ㄖㄜˋ 鬧' }, { char: '宮', question: '皇( )ㄍㄨㄥ' },
         { char: '涼', question: '冰( )ㄌㄧㄤˊ' }, { char: '踩', question: '( )ㄘㄞˇ 踏' }, { char: '毯', question: '地( )ㄊㄢˇ' }, { char: '暖', question: '溫( )ㄋㄨㄢˇ' },
-        { char: '馬', question: '( )ㄇㄚˇ 上' }, { char: '壞', question: '( )ㄏㄨㄞˋ 人' }, { char: '難', question: '困( )ㄋㄢˊ' }, { char: '決', question: '決( )ㄉㄧㄥˋ' },
+        { char: '馬', question: '( )ㄇㄚˇ 上' }, { char: '壞', question: '( )ㄏㄨㄞˋ 人' }, { char: '難', question: '困( )ㄋㄢˊ' }, { char: '定', question: '決( )ㄉㄧㄥˋ' },
         { char: '更', question: '( )ㄍㄥˋ 好' }, { char: '隨', question: '( )ㄙㄨㄟˊ 便' }, { char: '主', question: '( )ㄓㄨˇ 人' }, { char: '法', question: '方( )ㄈㄚˇ' },
         { char: '於', question: '終( )ㄩˊ' }, { char: '舒', question: '( )ㄕㄨ 服' }
     ],
     'NY_2_10': [
-        { char: '群', question: '一( )ㄑㄩㄣˊ' }, { char: '靜', question: '安( )ㄐㄧㄥˋ' }, { char: '抬', question: '( )ㄊㄞˊ 頭' }, { char: '非', question: '( )ㄈㄟ 常' },
+        { char: '群', question: '一( )ㄑㄩㄣˊ' }, { char: '靜', question: '安( )ㄐㄧㄥˋ' }, { char: '抬', question: '( )ㄊㄞˊ 頭' }, { char: '非', question: '( )ㄈㄟ 非常' },
         { char: '趣', question: '有( )ㄑㄩˋ' }, { char: '近', question: '附( )ㄐㄧㄣˋ' }, { char: '堆', question: '土( )ㄉㄨㄟ' }, { char: '棉', question: '( )ㄇㄧㄢˊ 花' },
         { char: '遠', question: '遙( )ㄩㄢˇ' }, { char: '景', question: '風( )ㄐㄧㄥˇ' }, { char: '忽', question: '( )ㄏㄨ 忽然' }, { char: '聽', question: '( )ㄊㄧㄥ 見' },
         { char: '揮', question: '( )ㄏㄨㄟ 手' }, { char: '慢', question: '( )ㄇㄢˋ 跑' }, { char: '依', question: '( )ㄧ 然' }, { char: '捨', question: '( )ㄕㄜˇ 得' },
@@ -343,10 +339,6 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '料', question: '顏( )ㄌㄧㄠˋ' }, { char: '湖', question: '( )ㄏㄨˊ 泊' }, { char: '調', question: '( )ㄊㄧㄠˊ 色' }, { char: '迷', question: '( )ㄇㄧˊ 路' },
         { char: '逛', question: '( )ㄍㄨㄤˋ 街' }, { char: '兒', question: '嬰( )ㄦˊ' }
     ],
-    
-    // =========================================================================
-    // 南一 (Nanyi) - Grade 3
-    // =========================================================================
     'NY_3_1': [
         { char: '泥', question: '爛( )ㄋㄧˊ' }, { char: '化', question: '變( )ㄏㄨㄚˋ' }, { char: '雀', question: '麻( )ㄑㄩㄝˋ' }, { char: '輕', question: '年( )ㄑㄧㄥ' },
         { char: '羽', question: '( )ㄩˇ 毛' }, { char: '衣', question: '( )ㄧ 服' }, { char: '脆', question: '清( )ㄘㄨㄟˋ' }, { char: '髮', question: '頭( )ㄈㄚˇ' },
@@ -424,47 +416,40 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     // 翰林 (Hanlin) - Grade 1
     // =========================================================================
     'HL_1_1': [
-        { char: '起', question: '( )ㄑㄧˇ 立' }, { char: '走', question: '( )ㄗㄡˇ 路' }, { char: '你', question: '( )ㄋㄧˇ 好' }, 
-        { char: '在', question: '現( )ㄗㄞˋ' }, { char: '左', question: '( )ㄗㄨㄛˇ 邊' }, { char: '我', question: '( )ㄨㄛˇ 們' }, 
-        { char: '右', question: '( )ㄧㄡˋ 手' }, { char: '和', question: '( )ㄏㄜˊ 平' }, { char: '向', question: '方( )ㄒㄧㄤˋ' }, 
-        { char: '前', question: '( )ㄑㄧㄢˊ 面' }
+        { char: '起', question: '( )ㄑㄧˇ 立' }, { char: '走', question: '( )ㄗㄡˇ 路' }, { char: '你', question: '( )ㄋㄧˇ 好' }, { char: '在', question: '現( )ㄗㄞˋ' }, 
+        { char: '左', question: '( )ㄗㄨㄛˇ 邊' }, { char: '我', question: '( )ㄨㄛˇ 們' }, { char: '右', question: '( )ㄧㄡˋ 手' }, { char: '和', question: '( )ㄏㄜˊ 平' }, 
+        { char: '向', question: '方( )ㄒㄧㄤˋ' }, { char: '前', question: '( )ㄑㄧㄢˊ 面' }
     ],
     'HL_1_2': [
-        { char: '大', question: '( )ㄉㄚˋ 象' }, { char: '風', question: '颳( )ㄈㄥ' }, { char: '吹', question: '( )ㄔㄨㄟ 氣' }, 
-        { char: '們', question: '他( )ㄇㄣ˙' }, { char: '來', question: '( )ㄌㄞˊ 去' }, { char: '玩', question: '( )ㄨㄢˊ 具' }, 
-        { char: '不', question: '( )ㄅㄨˊ 是' }, { char: '停', question: '( )ㄊㄧㄥˊ 車' }, { char: '的', question: '好( )ㄉㄜ˙' }, 
-        { char: '跑', question: '( )ㄆㄠˇ 步' }
+        { char: '大', question: '( )ㄉㄚˋ 象' }, { char: '風', question: '颳( )ㄈㄥ' }, { char: '吹', question: '( )ㄔㄨㄟ 氣' }, { char: '們', question: '他( )ㄇㄣ˙' }, 
+        { char: '來', question: '( )ㄌㄞˊ 去' }, { char: '玩', question: '( )ㄨㄢˊ 具' }, { char: '不', question: '( )ㄅㄨˊ 是' }, { char: '停', question: '( )ㄊㄧㄥˊ 車' }, 
+        { char: '的', question: '好( )ㄉㄜ˙' }, { char: '跑', question: '( )ㄆㄠˇ 步' }
     ],
     'HL_1_3': [
-        { char: '火', question: '( )ㄏㄨㄛˇ 車' }, { char: '車', question: '汽( )ㄔㄜ' }, { char: '山', question: '爬( )ㄕㄢ' }, 
-        { char: '洞', question: '( )ㄉㄨㄥˋ 穴' }, { char: '個', question: '一( )ㄍㄜ˙' }, { char: '又', question: '( )ㄧㄡˋ 來' }, 
-        { char: '出', question: '( )ㄔㄨ 門' }, { char: '小', question: '( )ㄒㄧㄠˇ 狗' }, { char: '堆', question: '土( )ㄉㄨㄟ' }, 
-        { char: '開', question: '( )ㄎㄞ 心' }, { char: '心', question: '愛( )ㄒㄧㄣ' }
+        { char: '火', question: '( )ㄏㄨㄛˇ 車' }, { char: '車', question: '汽( )ㄔㄜ' }, { char: '山', question: '爬( )ㄕㄢ' }, { char: '洞', question: '( )ㄉㄨㄥˋ 穴' }, 
+        { char: '個', question: '一( )ㄍㄜ˙' }, { char: '又', question: '( )ㄧㄡˋ 來' }, { char: '出', question: '( )ㄔㄨ 門' }, { char: '小', question: '( )ㄒㄧㄠˇ 狗' }, 
+        { char: '堆', question: '土( )ㄉㄨㄟ' }, { char: '開', question: '( )ㄎㄞ 心' }, { char: '心', question: '愛( )ㄒㄧㄣ' }
     ],
     'HL_1_4': [
-        { char: '請', question: '( )ㄑㄧㄥˇ 問' }, { char: '問', question: '學( )ㄨㄣˋ' }, { char: '草', question: '( )ㄘㄠˇ 地' }, 
-        { char: '天', question: '( )ㄊㄧㄢ 空' }, { char: '有', question: '沒( )ㄧㄡˇ' }, { char: '多', question: '許( )ㄉㄨㄛ' }, 
-        { char: '高', question: '( )ㄍㄠ 興' }, { char: '星', question: '( )ㄒㄧㄥ 星' }, { char: '少', question: '減( )ㄕㄠˇ' }, 
-        { char: '太', question: '( )ㄊㄞˋ 陽' }, { char: '了', question: '走( )ㄌㄜ˙' }, { char: '水', question: '喝( )ㄕㄨㄟˇ' }, 
+        { char: '請', question: '( )ㄑㄧㄥˇ 問' }, { char: '問', question: '學( )ㄨㄣˋ' }, { char: '草', question: '( )ㄘㄠˇ 地' }, { char: '天', question: '( )ㄊㄧㄢ 空' }, 
+        { char: '有', question: '沒( )ㄧㄡˇ' }, { char: '多', question: '許( )ㄉㄨㄛ' }, { char: '高', question: '( )ㄍㄠ 興' }, { char: '星', question: '( )ㄒㄧㄥ 星' }, 
+        { char: '少', question: '減( )ㄕㄠˇ' }, { char: '太', question: '( )ㄊㄞˋ 陽' }, { char: '了', question: '走( )ㄌㄜ˙' }, { char: '水', question: '喝( )ㄕㄨㄟˇ' }, 
         { char: '去', question: '過( )ㄑㄩˋ' }
     ],
     'HL_1_5': [
-        { char: '彩', question: '( )ㄘㄞˇ 虹' }, { char: '上', question: '樓( )ㄕㄤˋ' }, { char: '好', question: '( )ㄏㄠˇ 人' }, 
-        { char: '想', question: '( )ㄒㄧㄤˇ 念' }, { char: '爬', question: '( )ㄆㄚˊ 山' }, { char: '看', question: '( )ㄎㄢˋ 書' }, 
-        { char: '沒', question: '( )ㄇㄟˊ 有' }, { char: '棉', question: '( )ㄇㄧㄢˊ 被' }, { char: '花', question: '( )ㄏㄨㄚ 朵' }, 
-        { char: '下', question: '樓( )ㄒㄧㄚˋ' }, { char: '泡', question: '( )ㄆㄠˋ 泡' }, { char: '池', question: '水( )ㄔˊ' }
+        { char: '彩', question: '( )ㄘㄞˇ 虹' }, { char: '上', question: '樓( )ㄕㄤˋ' }, { char: '好', question: '( )ㄏㄠˇ 人' }, { char: '想', question: '( )ㄒㄧㄤˇ 念' }, 
+        { char: '爬', question: '( )ㄆㄚˊ 山' }, { char: '看', question: '( )ㄎㄢˋ 書' }, { char: '沒', question: '( )ㄇㄟˊ 有' }, { char: '棉', question: '( )ㄇㄧㄢˊ 被' }, 
+        { char: '花', question: '( )ㄏㄨㄚ 朵' }, { char: '下', question: '樓( )ㄒㄧㄚˋ' }, { char: '泡', question: '( )ㄆㄠˋ 泡' }, { char: '池', question: '水( )ㄔˊ' }
     ],
     'HL_1_6': [
-        { char: '秋', question: '( )ㄑㄧㄡ 天' }, { char: '千', question: '( )ㄑㄧㄢ 萬' }, { char: '子', question: '兒( )ㄗ˙' }, 
-        { char: '空', question: '( )ㄎㄨㄥ 氣' }, { char: '說', question: '聽( )ㄕㄨㄛ' }, { char: '早', question: '( )ㄗㄠˇ 安' }, 
-        { char: '田', question: '農( )ㄊㄧㄢˊ' }, { char: '是', question: '就( )ㄕˋ' }, { char: '誰', question: '( )ㄕㄟˊ 的' }, 
-        { char: '陪', question: '( )ㄆㄟˊ 伴' }, { char: '他', question: '其( )ㄊㄚ' }
+        { char: '秋', question: '( )ㄑㄧㄡ 天' }, { char: '千', question: '( )ㄑㄧㄢ 萬' }, { char: '子', question: '兒( )ㄗ˙' }, { char: '空', question: '( )ㄎㄨㄥ 氣' }, 
+        { char: '說', question: '聽( )ㄕㄨㄛ' }, { char: '早', question: '( )ㄗㄠˇ 安' }, { char: '田', question: '農( )ㄊㄧㄢˊ' }, { char: '是', question: '就( )ㄕˋ' }, 
+        { char: '誰', question: '( )ㄕㄟˊ 的' }, { char: '陪', question: '( )ㄆㄟˊ 伴' }, { char: '他', question: '其( )ㄊㄚ' }
     ],
     'HL_1_7': [
-        { char: '回', question: '( )ㄏㄨㄟˊ 家' }, { char: '音', question: '聲( )ㄧㄣ' }, { char: '到', question: '來( )ㄉㄠˋ' }, 
-        { char: '谷', question: '山( )ㄍㄨˇ' }, { char: '叫', question: '尖( )ㄐㄧㄠˋ' }, { char: '人', question: '大( )ㄖㄣˊ' }, 
-        { char: '嗎', question: '好( )ㄇㄚ ' }, { char: '也', question: '( )ㄧㄝˇ 是' }, { char: '笑', question: '微( )ㄒㄧㄠˋ' }, 
-        { char: '哈', question: '( )ㄏㄚ 哈' }
+        { char: '回', question: '( )ㄏㄨㄟˊ 家' }, { char: '音', question: '聲( )ㄧㄣ' }, { char: '到', question: '來( )ㄉㄠˋ' }, { char: '谷', question: '山( )ㄍㄨˇ' }, 
+        { char: '叫', question: '尖( )ㄐㄧㄠˋ' }, { char: '人', question: '大( )ㄖㄣˊ' }, { char: '嗎', question: '好( )ㄇㄚ˙' }, { char: '也', question: '( )ㄧㄝˇ 是' }, 
+        { char: '笑', question: '微( )ㄒㄧㄠˋ' }, { char: '哈', question: '( )ㄏㄚ 哈' }
     ],
 
     // =========================================================================
@@ -501,7 +486,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'HL_2_5': [
         { char: '沙', question: '( )ㄕㄚ 灘' }, { char: '灘', question: '海( )ㄊㄢ' }, { char: '海', question: '( )ㄏㄞˇ 邊' }, { char: '邊', question: '旁( )ㄅㄧㄢ' },
         { char: '退', question: '後( )ㄊㄨㄟˋ' }, { char: '遠', question: '遙( )ㄩㄢˇ' }, { char: '螃', question: '( )ㄆㄤˊ 蟹' }, { char: '蟹', question: '螃( )ㄒㄧㄝˋ' },
-        { char: '愛', question: '可( )ㄞˋ' }, { char: '注', question: '( )ㄓㄨˋ 意' }, { char: '夕', question: '( )ㄒㄧˋ 陽' }, { char: '腳', question: '( )ㄐㄧㄠˇ 步' },
+        { char: '愛', question: '可( )ㄞˋ' }, { char: '注', question: '( )ㄓㄨˋ 意' }, { char: '夕', question: '( )ㄒㄧ 陽' }, { char: '腳', question: '( )ㄐㄧㄠˇ 步' },
         { char: '丫', question: '腳( )ㄧㄚ' }, { char: '橫', question: '( )ㄏㄥˊ 線' }, { char: '留', question: '( )ㄌㄧㄡˊ 下' }, { char: '印', question: '( )ㄧㄣˋ 章' },
         { char: '挖', question: '( )ㄨㄚ 土' }, { char: '麗', question: '美( )ㄌㄧˋ' }
     ],
@@ -548,8 +533,8 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '西', question: '東( )ㄒㄧ' }, { char: '底', question: '海( )ㄉㄧˇ' }
     ],
     'HL_2_12': [
-        { char: '思', question: '思( )ㄋㄧㄢˋ' }, { char: '歌', question: '歌( )ㄑㄩˇ' }, { char: '品', question: '品( )ㄒㄧㄤˋ' }, { char: '浮', question: '( )ㄈㄨˊ 沉' },
-        { char: '手', question: '手( )ㄓㄤˇ' }, { char: '撥', question: '( )ㄅㄛ 開' }, { char: '波', question: '( )ㄅㄛ 浪' }, { char: '詩', question: '( )ㄕ 歌' },
+        { char: '念', question: '思( )ㄋㄧㄢˋ' }, { char: '曲', question: '歌( )ㄑㄩˇ' }, { char: '項', question: '頸( )ㄒㄧㄤˋ' }, { char: '浮', question: '( )ㄈㄨˊ 沉' },
+        { char: '掌', question: '手( )ㄓㄤˇ' }, { char: '撥', question: '( )ㄅㄛ 開' }, { char: '波', question: '( )ㄅㄛ 浪' }, { char: '詩', question: '( )ㄕ 歌' },
         { char: '作', question: '( )ㄗㄨㄛˋ 業' }, { char: '首', question: '一( )ㄕㄡˇ' }, { char: '指', question: '( )ㄓˇ 頭' }, { char: '伸', question: '( )ㄕㄣ 手' },
         { char: '脖', question: '( )ㄅㄛˊ 子' }, { char: '身', question: '( )ㄕㄣ 體' }, { char: '體', question: '育( )ㄊㄧˇ' }, { char: '隻', question: '一( )ㄓ' },
         { char: '倒', question: '( )ㄉㄠˋ 車' }, { char: '肚', question: '( )ㄉㄨˋ 子' }
@@ -559,7 +544,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     // 翰林 (Hanlin) - Grade 3
     // =========================================================================
     'HL_3_1': [
-        { char: '待', question: '等( )ㄉㄞˋ' }, { char: '牠', question: '( )ㄊㄚ 們(動物)' }, { char: '吞', question: '( )ㄊㄨㄣ 嚥' }, { char: '寸', question: '一( )ㄘㄨㄣˋ' },
+        { char: '等', question: '等( )ㄉㄞˋ' }, { char: '牠', question: '( )ㄊㄚ 們(動物)' }, { char: '吞', question: '( )ㄊㄨㄣ 嚥' }, { char: '寸', question: '一( )ㄘㄨㄣˋ' },
         { char: '碌', question: '忙( )ㄌㄨˋ' }, { char: '奔', question: '( )ㄅㄣ 跑' }, { char: '斑', question: '( )ㄅㄢ 馬' }, { char: '實', question: '誠( )ㄕˊ' },
         { char: '彈', question: '( )ㄊㄢˊ 琴' }, { char: '樂', question: '快( )ㄌㄜˋ' }, { char: '它', question: '( )ㄊㄚ 們(物品)' }, { char: '短', question: '長( )ㄉㄨㄢˇ' },
         { char: '悲', question: '慈( )ㄅㄟ' }, { char: '傷', question: '受( )ㄕㄤ' }, { char: '永', question: '( )ㄩㄥˇ 遠' }
@@ -592,7 +577,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '黏', question: '( )ㄋㄧㄢˊ 貼' }, { char: '木', question: '( )ㄇㄨˋ 頭' }, { char: '製', question: '( )ㄓˋ 造' }, { char: '部', question: '( )ㄅㄨˋ 分' },
         { char: '混', question: '( )ㄏㄨㄣˋ 合' }, { char: '斷', question: '折( )ㄉㄨㄢˋ' }, { char: '解', question: '( )ㄐㄧㄝˇ 釋' }, { char: '機', question: '飛( )ㄐㄧ' },
         { char: '器', question: '機( )ㄑㄧˋ' }, { char: '另', question: '( )ㄌㄧㄥˋ 外' }, { char: '治', question: '( )ㄓˋ 療' }, { char: '枝', question: '樹( )ㄓ' },
-        { char: '桿', question: '旗( )ㄍㄢ' }, { char: '擦', question: '( )ㄘㄚ 掉' }, { char: '削', question: '( )ㄒㄧㄠ 鉛筆' }
+        { char: '桿', question: '旗( )ㄍㄢˇ' }, { char: '擦', question: '( )ㄘㄚ 掉' }, { char: '削', question: '( )ㄒㄧㄠ 鉛筆' }
     ],
     'HL_3_7': [
         { char: '鹹', question: '( )ㄒㄧㄢˊ 味' }, { char: '蔚', question: '( )ㄨㄟˋ 藍' }, { char: '航', question: '( )ㄏㄤˊ 行' }, { char: '乘', question: '( )ㄔㄥˊ 客' },
@@ -633,7 +618,6 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     ],
 };
 
-
 export const LESSON_NAMES: Record<string, string> = {
     'HL': '翰林',
     'KX': '康軒',
@@ -641,6 +625,7 @@ export const LESSON_NAMES: Record<string, string> = {
 };
 
 interface GameState {
+  // ... (existing fields)
   status: GameStatus;
   score: number;
   highScore: number;
@@ -653,9 +638,9 @@ interface GameState {
   
   // --- SETTINGS ---
   difficulty: Difficulty;
-  victoryTarget: number; // 0 means unlimited
-  maxSpeedSetting: number; // 100, 150, 0
-  startingLivesSetting: number; // 3, 5, 8
+  victoryTarget: number;
+  maxSpeedSetting: number;
+  startingLivesSetting: number;
   ttsEnabled: boolean;
   devMode: boolean;
 
@@ -664,6 +649,10 @@ interface GameState {
   totalCorrectAnswers: number;
   consecutiveIgnores: number;
   wrongAnswers: WrongAnswer[];
+  
+  // --- CUSTOM LESSON ---
+  customLesson: VocabItem[];
+  customLessonRaw: string;
   
   // --- SKILLS ---
   hasDoubleJump: boolean;
@@ -685,7 +674,7 @@ interface GameState {
   activePets: PetID[]; 
   lastPetActionTime: number;
   ownedThemes: ThemeID[];
-  currentThemeIndex: number; // NEW: Track theme cycle index
+  currentThemeIndex: number;
 
   // --- GAMEPLAY ---
   currentVocab: VocabItem | null;
@@ -723,9 +712,13 @@ interface GameState {
   toggleDevMode: () => void;
   getCurrentTheme: () => ThemeID;
   setSpeed: (speed: number) => void;
+  
+  // --- NEW ACTIONS ---
+  setCustomLesson: (input: string) => void;
 }
 
 export const useStore = create<GameState>((set, get) => ({
+  // ... (initial state)
   status: GameStatus.MENU,
   score: 0,
   highScore: 0,
@@ -736,21 +729,22 @@ export const useStore = create<GameState>((set, get) => ({
   level: 1,
   laneCount: 3,
   
-  // Settings
-  difficulty: Difficulty.ADVANCED, // Default to Normal (Advanced)
+  difficulty: Difficulty.ADVANCED,
   victoryTarget: 20,
   maxSpeedSetting: 100,
   startingLivesSetting: 3,
   ttsEnabled: false,
   devMode: false,
 
-  // Progress
   selectedLessonIds: [], 
   totalCorrectAnswers: 0,
   consecutiveIgnores: 0,
   wrongAnswers: [],
+  
+  // Custom Lesson Initial State
+  customLesson: [],
+  customLessonRaw: '',
 
-  // Skills
   hasDoubleJump: false,
   hasImmortality: false,
   isImmortalityActive: false,
@@ -765,18 +759,16 @@ export const useStore = create<GameState>((set, get) => ({
   hasGemDoubler: false,
   hasMagnet: false,
 
-  // Pets & Themes
   ownedPets: [],
   activePets: [],
   lastPetActionTime: 0,
-  ownedThemes: [ThemeID.SYNTHWAVE], // Default theme
+  ownedThemes: [ThemeID.SYNTHWAVE],
   currentThemeIndex: 0,
 
   currentVocab: null,
   isManualSlowMotion: false,
 
   setStatus: (status) => set({ status }),
-  
   setDifficulty: (diff) => set({ difficulty: diff }),
   setVictoryTarget: (target) => set({ victoryTarget: target }),
   setMaxSpeed: (val) => set({ maxSpeedSetting: val }),
@@ -784,20 +776,18 @@ export const useStore = create<GameState>((set, get) => ({
   setTtsEnabled: (enabled) => set({ ttsEnabled: enabled }),
   setSpeed: (speed) => set({ speed }),
 
+  // ... (methods mostly unchanged)
   getCurrentTheme: () => {
       const { ownedThemes, currentThemeIndex } = get();
       const fullOrder = [ThemeID.SYNTHWAVE, ThemeID.INFERNO, ThemeID.GLACIER, ThemeID.TOXIC];
       const availableRotation = fullOrder.filter(t => ownedThemes.includes(t));
-      
       if (availableRotation.length === 0) return ThemeID.SYNTHWAVE;
-
       return availableRotation[currentThemeIndex % availableRotation.length];
   },
 
   toggleDevMode: () => {
       const currentMode = get().devMode;
       if (!currentMode) {
-          // Enable Dev Mode: Unlock everything
           set({ 
               devMode: true,
               score: 80000,
@@ -812,7 +802,6 @@ export const useStore = create<GameState>((set, get) => ({
               ownedThemes: [ThemeID.SYNTHWAVE, ThemeID.INFERNO, ThemeID.GLACIER, ThemeID.TOXIC]
           });
       } else {
-          // Disable Dev Mode: Reset everything to fresh state
           set({
               devMode: false,
               score: 0,
@@ -833,6 +822,45 @@ export const useStore = create<GameState>((set, get) => ({
       }
   },
 
+  // NEW: Custom Lesson Logic
+  setCustomLesson: (input: string) => {
+      const parsed: VocabItem[] = [];
+      // Split by newline AND semicolon (both standard and fullwidth)
+      const lines = input.split(/\n|;|；/);
+      
+      lines.forEach(line => {
+          // Support both standard and fullwidth comma
+          const parts = line.split(/,|，/);
+          if (parts.length >= 3) {
+              const char = parts[0].trim();
+              const zhuyin = parts[1].trim();
+              const word = parts[2].trim();
+              
+              if (char && zhuyin && word) {
+                  // Smart Replace: Create ( )zhuyin question
+                  // If char found in word, replace it. 
+                  // Otherwise append hint at the end as a fallback
+                  let question = '';
+                  if (word.includes(char)) {
+                      question = word.replace(char, `( )${zhuyin} `);
+                  } else {
+                      question = `${word} (( )${zhuyin})`;
+                  }
+                  
+                  parsed.push({ char, question });
+              }
+          }
+      });
+      
+      set({ customLessonRaw: input, customLesson: parsed });
+      
+      // Save to local storage immediately for convenience
+      const currentSave = localStorage.getItem('gemini_runner_save');
+      let saveData = currentSave ? JSON.parse(currentSave) : {};
+      saveData.customLessonRaw = input;
+      localStorage.setItem('gemini_runner_save', JSON.stringify(saveData));
+  },
+
   loadData: () => {
       const saved = localStorage.getItem('gemini_runner_save');
       if (saved) {
@@ -851,6 +879,11 @@ export const useStore = create<GameState>((set, get) => ({
                   activePets: data.activePets || [],
                   ownedThemes: data.ownedThemes && data.ownedThemes.length > 0 ? data.ownedThemes : [ThemeID.SYNTHWAVE],
               });
+              
+              // Load Custom Lesson
+              if (data.customLessonRaw) {
+                  get().setCustomLesson(data.customLessonRaw);
+              }
           } catch (e) {
               console.error("Failed to load save", e);
           }
@@ -867,20 +900,24 @@ export const useStore = create<GameState>((set, get) => ({
   }),
 
   startGame: () => {
-      const { startingLivesSetting, speak, ttsEnabled } = get();
+      const { startingLivesSetting, ttsEnabled, customLesson } = get();
 
-      // Combine vocab from all selected lessons
       const selectedIds = get().selectedLessonIds;
       let pool: VocabItem[] = [];
       
       selectedIds.forEach(id => {
-          if (LESSON_DATA[id]) {
+          if (id === 'CUSTOM') {
+              // Inject Custom Lesson
+              if (customLesson.length > 0) {
+                  pool = pool.concat(customLesson);
+              }
+          } else if (LESSON_DATA[id]) {
               pool = pool.concat(LESSON_DATA[id]);
           }
       });
       
-      // Fallback if empty
       if (pool.length === 0) {
+          // Fallback if nothing valid selected
           const anyKey = Object.keys(LESSON_DATA)[0];
           if (anyKey) pool = LESSON_DATA[anyKey];
           else pool = [{char: '無', question: '無題庫'}];
@@ -908,7 +945,7 @@ export const useStore = create<GameState>((set, get) => ({
           consecutiveIgnores: 0,
           wrongAnswers: [],
           correctCountForHeal: 0,
-          currentThemeIndex: 0 // Reset theme on start
+          currentThemeIndex: 0
       });
   },
 
@@ -930,15 +967,12 @@ export const useStore = create<GameState>((set, get) => ({
       const { lives, status, score, highScore, hasImmortality, isImmortalityActive, difficulty } = get();
       if (status !== GameStatus.PLAYING) return;
       if (isImmortalityActive) return;
-
-      // Super Simple Difficulty: No Damage
       if (difficulty === Difficulty.SUPER_SIMPLE) return;
 
       const newLives = lives - 1;
       set({ lives: newLives });
 
       if (newLives <= 0) {
-          // Save High Score
           if (score > highScore) {
               localStorage.setItem('gemini_runner_save', JSON.stringify({
                   highScore: score,
@@ -951,7 +985,8 @@ export const useStore = create<GameState>((set, get) => ({
                   hasMagnet: get().hasMagnet,
                   ownedPets: get().ownedPets,
                   activePets: get().activePets,
-                  ownedThemes: get().ownedThemes
+                  ownedThemes: get().ownedThemes,
+                  customLessonRaw: get().customLessonRaw // Preserve custom lesson
               }));
           }
           set({ status: GameStatus.GAME_OVER, highScore: Math.max(score, highScore) });
@@ -960,14 +995,8 @@ export const useStore = create<GameState>((set, get) => ({
 
   collectGem: (amount, isMarioBonus = false) => {
       let multiplier = 1;
-      // Passive Gem Doubler
-      if (get().hasGemDoubler) {
-          multiplier *= 2; // Base 2x
-      }
-      // Mario Bonus (Stacks!)
-      if (isMarioBonus) {
-          multiplier *= 2; // Another 2x
-      }
+      if (get().hasGemDoubler) multiplier *= 2;
+      if (isMarioBonus) multiplier *= 2;
       set((state) => ({ score: state.score + (amount * multiplier) }));
   },
 
@@ -996,16 +1025,14 @@ export const useStore = create<GameState>((set, get) => ({
   },
 
   submitAnswer: (char) => {
-      const { currentVocab, score, selectedLessonIds, totalCorrectAnswers, hasPassiveHeal, correctCountForHeal, victoryTarget, maxSpeedSetting, activePets, ttsEnabled } = get();
+      const { currentVocab, score, selectedLessonIds, totalCorrectAnswers, hasPassiveHeal, correctCountForHeal, victoryTarget, maxSpeedSetting, activePets, ttsEnabled, customLesson } = get();
       
       if (!currentVocab) return false;
 
       if (char === currentVocab.char) {
-          // Correct
           let newLives = get().lives;
           let newHealCount = correctCountForHeal;
           
-          // Passive Heal Logic
           if (hasPassiveHeal) {
               newHealCount++;
               if (newHealCount >= 3) {
@@ -1016,27 +1043,29 @@ export const useStore = create<GameState>((set, get) => ({
 
           const newTotal = totalCorrectAnswers + 1;
           
-          // Check Victory Condition (0 means Infinite)
           if (victoryTarget > 0 && newTotal >= victoryTarget) {
              set({ status: GameStatus.VICTORY, totalCorrectAnswers: newTotal, score: score + 5000 });
              return true;
           }
           
-          // Speed Up Logic (Respect Max Speed Setting)
           let newSpeed = get().speed + 1.5;
           if (maxSpeedSetting > 0) {
               const maxAllowed = RUN_SPEED_BASE * (maxSpeedSetting / 100);
               if (newSpeed > maxAllowed) newSpeed = maxAllowed;
           }
 
-          // Level Up Logic (every 5 correct)
           const newLevel = Math.floor(newTotal / 5) + 1;
-          // Lane scaling caps at 9 lanes
           const newLaneCount = Math.min(9, 3 + Math.floor((newLevel - 1) / 2) * 2);
 
-          // Pick new vocab
+          // Re-generate pool
           let pool: VocabItem[] = [];
-          selectedLessonIds.forEach(id => { if (LESSON_DATA[id]) pool = pool.concat(LESSON_DATA[id]); });
+          selectedLessonIds.forEach(id => { 
+              if (id === 'CUSTOM') {
+                  if (customLesson.length > 0) pool = pool.concat(customLesson);
+              } else if (LESSON_DATA[id]) {
+                  pool = pool.concat(LESSON_DATA[id]); 
+              }
+          });
           if (pool.length === 0) {
               const anyKey = Object.keys(LESSON_DATA)[0];
               if (anyKey) pool = LESSON_DATA[anyKey];
@@ -1052,7 +1081,6 @@ export const useStore = create<GameState>((set, get) => ({
              import('./components/System/Audio').then(mod => mod.audio.speak(nextVocab.question));
           }
 
-          // Activate invincibility if leveled up (multiple of 5)
           const isLevelUp = newTotal % 5 === 0;
 
           set({
@@ -1069,7 +1097,6 @@ export const useStore = create<GameState>((set, get) => ({
           });
           return true;
       } else {
-          // Wrong
           const isMechaEquipped = activePets.includes(PetID.MECHA);
           if (!isMechaEquipped) {
               get().takeDamage();
@@ -1097,23 +1124,15 @@ export const useStore = create<GameState>((set, get) => ({
   openShop: () => set({ status: GameStatus.SHOP, isImmortalityActive: true }),
   
   closeShop: () => {
+       // Save state
+       const { highScore, hasDoubleJump, hasImmortality, hasFireball, hasFlight, hasPassiveHeal, hasGemDoubler, hasMagnet, ownedPets, activePets, ownedThemes, customLessonRaw } = get();
        localStorage.setItem('gemini_runner_save', JSON.stringify({
-          highScore: get().highScore,
-          hasDoubleJump: get().hasDoubleJump,
-          hasImmortality: get().hasImmortality,
-          hasFireball: get().hasFireball,
-          hasFlight: get().hasFlight,
-          hasPassiveHeal: get().hasPassiveHeal,
-          hasGemDoubler: get().hasGemDoubler,
-          hasMagnet: get().hasMagnet,
-          ownedPets: get().ownedPets,
-          activePets: get().activePets,
-          ownedThemes: get().ownedThemes
+          highScore, hasDoubleJump, hasImmortality, hasFireball, hasFlight, hasPassiveHeal, hasGemDoubler, hasMagnet, ownedPets, activePets, ownedThemes, customLessonRaw
       }));
       set((state) => ({ 
           status: GameStatus.PLAYING, 
           isImmortalityActive: true,
-          currentThemeIndex: state.currentThemeIndex + 1 // Switch theme on exit
+          currentThemeIndex: state.currentThemeIndex + 1
       }));
       setTimeout(() => {
         set({ isImmortalityActive: false });
@@ -1172,9 +1191,22 @@ export const useStore = create<GameState>((set, get) => ({
   updatePetActionTime: () => set({ lastPetActionTime: Date.now() }),
 
   getRandomDistractor: () => {
-      const allKeys = Object.keys(LESSON_DATA);
-      const randomKey = allKeys[Math.floor(Math.random() * allKeys.length)];
-      const lesson = LESSON_DATA[randomKey];
+      const { customLesson, selectedLessonIds } = get();
+      // Try to pick distractor from selected pool
+      const useCustom = selectedLessonIds.includes('CUSTOM') && customLesson.length > 0;
+      const poolSources = useCustom ? ['CUSTOM', ...Object.keys(LESSON_DATA)] : Object.keys(LESSON_DATA);
+      
+      const randomKey = poolSources[Math.floor(Math.random() * poolSources.length)];
+      let lesson: VocabItem[] = [];
+      
+      if (randomKey === 'CUSTOM') {
+          lesson = customLesson;
+      } else {
+          lesson = LESSON_DATA[randomKey] || [];
+      }
+      
+      if (lesson.length === 0) return '無';
+      
       const item = lesson[Math.floor(Math.random() * lesson.length)];
       return item.char;
   }

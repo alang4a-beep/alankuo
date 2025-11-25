@@ -1,13 +1,13 @@
 
 // ... (imports)
 import React, { useState, useEffect } from 'react';
-import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal, Baby, PauseCircle, Home, RotateCcw, Percent, Palette, Infinity } from 'lucide-react';
+import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal, Baby, PauseCircle, Home, RotateCcw, Percent, Palette, Infinity, FileEdit, Save, Check, Copy, Sparkles } from 'lucide-react';
 import { useStore } from '../../store';
 import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty, PetID, ThemeID } from '../../types';
 import { audio } from '../System/Audio';
 import { LESSON_NAMES, LESSON_DATA } from '../../store';
 
-// ... (SHOP_ITEMS and ShopScreen remain the same, skipping for brevity)
+// ... (SHOP_ITEMS constant remains same)
 const SHOP_ITEMS: ShopItem[] = [
     {
         id: 'HEAL',
@@ -109,7 +109,7 @@ const SHOP_ITEMS: ShopItem[] = [
     {
         id: 'THEME_INFERNO',
         name: '主題：烈焰地獄',
-        description: '解鎖深紅與橘黃色系的「烈焰」背景主題，感受燃燒的跑道！(每10關輪替)',
+        description: '解鎖深紅與橘黃色系的「烈焰」背景主題，感受燃燒的跑道！(每次進入商店切換)',
         cost: 8000,
         icon: Flame,
         oneTime: true,
@@ -118,16 +118,16 @@ const SHOP_ITEMS: ShopItem[] = [
     {
         id: 'THEME_GLACIER',
         name: '主題：極地冰封',
-        description: '解鎖冰藍與白雪色系的「極地」背景主題，體驗寒冷的極速！(每10關輪替)',
+        description: '解鎖冰藍與白雪色系的「極地」背景主題，體驗寒冷的極速！(每次進入商店切換)',
         cost: 8000,
-        icon: Wind, // Using Wind icon for cold/ice feel
+        icon: Wind,
         oneTime: true,
         themeId: ThemeID.GLACIER
     },
     {
         id: 'THEME_TOXIC',
         name: '主題：荒野毒氣',
-        description: '解鎖酸綠與螢光色系的「荒野」背景主題，充滿危險的氣息！(每10關輪替)',
+        description: '解鎖酸綠與螢光色系的「荒野」背景主題，充滿危險的氣息！(每次進入商店切換)',
         cost: 8000,
         icon: Ghost,
         oneTime: true,
@@ -153,6 +153,9 @@ const ShopScreen: React.FC = () => {
         }
     };
 
+    // Sort items by cost
+    const sortedItems = [...SHOP_ITEMS].sort((a, b) => a.cost - b.cost);
+
     return (
         <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-md overflow-y-auto custom-scrollbar">
              <div className="flex flex-col items-center justify-start min-h-full py-8 px-4">
@@ -176,11 +179,9 @@ const ShopScreen: React.FC = () => {
                  </div>
 
                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl w-full mb-8">
-                     {SHOP_ITEMS.map(item => {
+                     {sortedItems.map(item => {
                          const Icon = item.icon;
                          const owned = isOwned(item);
-                         // Logic: Sold out if one-time item is owned.
-                         // Exception: Pets can be toggled, Themes are passive unlocks.
                          const isSoldOut = item.oneTime && owned && !item.petId && !item.themeId; 
                          const canAfford = score >= item.cost;
                          const isPet = !!item.petId;
@@ -215,7 +216,7 @@ const ShopScreen: React.FC = () => {
                                      </button>
                                  ) : isTheme && owned ? (
                                      <div className="px-4 md:px-6 py-2 rounded font-bold w-full text-sm md:text-base bg-gray-800 text-yellow-400 border border-yellow-600/50 cursor-default">
-                                         已解鎖 (自動輪替)
+                                         已解鎖
                                      </div>
                                  ) : (
                                      <button 
@@ -248,18 +249,17 @@ const ShopScreen: React.FC = () => {
     );
 };
 
-// ... (WrongAnswerReview, MobileControls, PauseScreen unchanged)
 const WrongAnswerReview: React.FC = () => {
     const { wrongAnswers } = useStore();
     if (wrongAnswers.length === 0) return null;
 
     return (
-        <div className="w-full max-w-4xl mt-6 bg-red-900/30 border border-red-500/50 rounded-2xl p-6 overflow-hidden shadow-[0_0_30px_rgba(255,0,0,0.2)]">
-             <div className="flex items-center text-red-300 mb-4 font-black text-xl md:text-2xl border-b border-red-500/30 pb-2">
+        <div className="w-full max-w-4xl mt-6 bg-red-900/30 border border-red-500/50 rounded-2xl p-6 overflow-hidden shadow-[0_0_30px_rgba(255,0,0,0.2)] max-h-[60vh] flex flex-col">
+             <div className="flex items-center text-red-300 mb-4 font-black text-xl md:text-2xl border-b border-red-500/30 pb-2 shrink-0">
                  <AlertCircle className="w-6 h-6 mr-3" />
                  <span>答錯題目複習 ({wrongAnswers.length}題)</span>
              </div>
-             <div className="max-h-[50vh] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+             <div className="overflow-y-auto space-y-3 pr-2 custom-scrollbar flex-1">
                  {wrongAnswers.map((item, idx) => (
                      <div key={idx} className="bg-black/60 p-4 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 border border-red-500/20">
                          <div className="text-white font-serif text-2xl md:text-3xl font-bold">{item.question}</div>
@@ -433,13 +433,41 @@ export const HUD: React.FC = () => {
     devMode, toggleDevMode,
     returnToMenu,
     wrongAnswers,
-    setSpeed
+    setSpeed,
+    customLesson, customLessonRaw, setCustomLesson
   } = useStore();
 
   const [imageError, setImageError] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
-  const [activeTab, setActiveTab] = useState<'KX' | 'HL' | 'NY'>('HL'); 
+  const [activeTab, setActiveTab] = useState<'KX' | 'HL' | 'NY' | 'CUSTOM'>('HL'); 
   const [activeGrade, setActiveGrade] = useState<1 | 2 | 3>(1);
+  const [tempCustomInput, setTempCustomInput] = useState('');
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const promptText = `請幫我製作「生字跑酷遊戲」的題庫格式。
+我會提供一組生字，請你幫我針對每一個字：
+1. 標註注音 (若有輕聲請標註)。
+2. 造一個適合國小學生的語詞。
+3. 輸出格式必須嚴格遵守：生字,注音,語詞
+4. 不需要標題列，不需要解釋。
+5. 請用分號「;」將每一題隔開，以便複製。
+
+範例：
+拍,ㄆㄞ,拍手;手,ㄕㄡˇ,拍手;左,ㄗㄨㄛˇ,左邊
+
+我的生字是：
+[請在此處貼上您的生字，例如：樹、花、草]`;
+
+  const handleCopyPrompt = () => {
+      navigator.clipboard.writeText(promptText).then(() => {
+          setCopySuccess(true);
+          setTimeout(() => setCopySuccess(false), 2000);
+      });
+  };
+
+  useEffect(() => {
+      setTempCustomInput(customLessonRaw);
+  }, [customLessonRaw]);
 
   useEffect(() => {
       const handleOnline = () => setIsOffline(false);
@@ -454,14 +482,10 @@ export const HUD: React.FC = () => {
   
   const containerClass = "absolute inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 z-50";
 
-  // Calculate percentage based on current effective speed
   let speedMultiplier = 1.0;
   if (isManualSlowMotion) speedMultiplier *= 0.3;
-  
   const effectiveSpeed = speed * speedMultiplier;
   const speedPercent = Math.round((effectiveSpeed / RUN_SPEED_BASE) * 100);
-
-  // Calculate Accuracy for End Screens
   const totalAttempts = totalCorrectAnswers + wrongAnswers.length;
   const accuracy = totalAttempts > 0 ? Math.round((totalCorrectAnswers / totalAttempts) * 100) : 0;
 
@@ -533,6 +557,7 @@ export const HUD: React.FC = () => {
                                 </button>
                             </div>
 
+                            {/* Difficulty and Game Modes */}
                             <div className="mb-4">
                                 <div className="text-sm text-gray-400 mb-2 flex items-center"><Target className="w-3 h-3 mr-1"/> 挑戰題數</div>
                                 <div className="flex gap-2">
@@ -644,6 +669,7 @@ export const HUD: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Lesson Selection */}
                         <div className="mb-8">
                             <div className="flex items-center justify-center text-cyan-400 mb-4 font-bold text-lg">
                                 <BookOpen className="w-5 h-5 mr-2" /> 
@@ -653,47 +679,116 @@ export const HUD: React.FC = () => {
                                 <button onClick={() => setActiveTab('KX')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'KX' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>康軒</button>
                                 <button onClick={() => setActiveTab('HL')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'HL' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>翰林</button>
                                 <button onClick={() => setActiveTab('NY')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'NY' ? 'bg-gray-700 border-cyan-400 text-white' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>南一</button>
+                                <button onClick={() => setActiveTab('CUSTOM')} className={`flex-1 py-2 rounded-t-lg font-bold border-b-2 transition-colors ${activeTab === 'CUSTOM' ? 'bg-gray-700 border-cyan-400 text-yellow-400' : 'bg-gray-800 border-transparent text-gray-500 hover:text-gray-300'}`}>自訂</button>
                             </div>
-                             <div className="flex space-x-2 mb-4 px-4">
-                                <button onClick={() => setActiveGrade(1)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 1 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>一年級</button>
-                                <button onClick={() => setActiveGrade(2)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 2 ? 'bg-purple-600 text-white ring-2 ring-purple-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>二年級</button>
-                                <button onClick={() => setActiveGrade(3)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 3 ? 'bg-orange-600 text-white ring-2 ring-orange-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>三年級</button>
-                            </div>
-                            <div className="grid grid-cols-4 gap-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar bg-gray-800/30 p-3 rounded-b-lg">
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
-                                        const id = `${activeTab}_${activeGrade}_${num}`; // e.g. KX_1_1
-                                        const isAvailable = !!LESSON_DATA[id];
-                                        const isSelected = selectedLessonIds.includes(id);
-                                        const vocabList = LESSON_DATA[id] || [];
-                                        const previewText = vocabList.length > 0 
-                                            ? vocabList.slice(0, 3).map(v => v.char).join('、') 
-                                            : '無內容';
-
-                                        if (!isAvailable) {
-                                            return (
-                                                 <div key={id} className="aspect-square rounded-lg border border-gray-800 bg-gray-900/30 flex items-center justify-center opacity-50">
-                                                     <span className="text-gray-700 font-bold text-lg">{num}</span>
-                                                 </div>
-                                            )
-                                        }
-
-                                        return (
-                                            <button
-                                                key={id}
-                                                onClick={() => toggleLesson(id)}
-                                                className={`group relative aspect-square rounded-lg border text-xs font-bold transition-all flex flex-col items-center justify-center ${isSelected 
-                                                    ? 'bg-cyan-900/60 border-cyan-400 text-white shadow-[0_0_5px_rgba(0,255,255,0.2)]' 
-                                                    : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-500 hover:bg-gray-800'}`}
+                            
+                            {activeTab === 'CUSTOM' ? (
+                                <div className="bg-gray-800/30 p-4 rounded-b-lg border border-gray-700">
+                                    {/* AI Prompt Helper */}
+                                    <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3 mb-4">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center text-purple-300 text-sm font-bold">
+                                                <Sparkles className="w-4 h-4 mr-2" /> AI 智能出題小幫手
+                                            </div>
+                                            <button 
+                                                onClick={handleCopyPrompt}
+                                                className={`text-xs px-2 py-1 rounded flex items-center transition-colors ${
+                                                    copySuccess ? 'bg-green-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                                                }`}
                                             >
-                                                <span className={`text-2xl md:text-3xl font-black mb-1 ${isSelected ? 'text-cyan-400' : 'text-gray-500'}`}>{num}</span>
-                                                {isSelected && <div className="absolute top-1 right-1 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]"></div>}
-                                                <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-[10px] text-gray-300 py-1 px-1 text-center opacity-0 group-hover:opacity-100 transition-opacity truncate rounded-b-lg">
-                                                    {previewText}...
-                                                </div>
+                                                {copySuccess ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                                                {copySuccess ? '已複製' : '複製提示詞'}
                                             </button>
-                                        );
-                                })}
-                            </div>
+                                        </div>
+                                        <p className="text-gray-400 text-xs mb-2 leading-relaxed">
+                                            不知道怎麼出題嗎？點擊右上角複製提示詞，貼給 ChatGPT 或 Gemini，再貼上你要考的生字，AI 就會自動幫你產生符合格式的題庫囉！
+                                        </p>
+                                    </div>
+
+                                    <div className="text-xs text-gray-400 mb-2 flex items-center">
+                                        <FileEdit className="w-3 h-3 mr-1" /> 
+                                        請輸入生字與造詞，格式：<span className="text-yellow-400 mx-1">生字,注音,造詞</span> (可用換行或分號隔開)
+                                    </div>
+                                    <textarea 
+                                        className="w-full h-40 bg-black/50 border border-gray-600 rounded-lg p-3 text-white text-sm font-mono focus:border-cyan-400 focus:outline-none resize-none mb-3"
+                                        placeholder={`拍,ㄆㄞ,拍手;手,ㄕㄡˇ,拍手;左,ㄗㄨㄛˇ,左邊`}
+                                        value={tempCustomInput}
+                                        onChange={(e) => setTempCustomInput(e.target.value)}
+                                    />
+                                    <div className="flex justify-between items-center">
+                                        <button 
+                                            onClick={() => setCustomLesson(tempCustomInput)}
+                                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-500 transition-colors"
+                                        >
+                                            <Save className="w-4 h-4 mr-2" /> 儲存自訂內容
+                                        </button>
+                                        <div className="text-xs text-gray-400">
+                                            已讀取 {customLesson.length} 題
+                                        </div>
+                                    </div>
+                                    
+                                    <hr className="my-4 border-gray-700" />
+                                    
+                                    <button
+                                        onClick={() => toggleLesson('CUSTOM')}
+                                        disabled={customLesson.length === 0}
+                                        className={`w-full py-3 rounded-lg font-bold flex items-center justify-center transition-all ${
+                                            selectedLessonIds.includes('CUSTOM')
+                                            ? 'bg-green-600 text-white shadow-[0_0_10px_lime]'
+                                            : customLesson.length === 0 ? 'bg-gray-800 text-gray-600 cursor-not-allowed' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                        }`}
+                                    >
+                                        {selectedLessonIds.includes('CUSTOM') ? (
+                                            <><Check className="w-5 h-5 mr-2" /> 已加入挑戰</>
+                                        ) : (
+                                            '加入挑戰'
+                                        )}
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex space-x-2 mb-4 px-4">
+                                        <button onClick={() => setActiveGrade(1)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 1 ? 'bg-blue-600 text-white ring-2 ring-blue-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>一年級</button>
+                                        <button onClick={() => setActiveGrade(2)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 2 ? 'bg-purple-600 text-white ring-2 ring-purple-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>二年級</button>
+                                        <button onClick={() => setActiveGrade(3)} className={`flex-1 py-1 rounded-full text-sm font-bold transition-colors ${activeGrade === 3 ? 'bg-orange-600 text-white ring-2 ring-orange-400' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>三年級</button>
+                                    </div>
+                                    <div className="grid grid-cols-4 gap-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar bg-gray-800/30 p-3 rounded-b-lg">
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
+                                                const id = `${activeTab}_${activeGrade}_${num}`; 
+                                                const isAvailable = !!LESSON_DATA[id];
+                                                const isSelected = selectedLessonIds.includes(id);
+                                                const vocabList = LESSON_DATA[id] || [];
+                                                const previewText = vocabList.length > 0 
+                                                    ? vocabList.slice(0, 3).map(v => v.char).join('、') 
+                                                    : '無內容';
+
+                                                if (!isAvailable) {
+                                                    return (
+                                                        <div key={id} className="aspect-square rounded-lg border border-gray-800 bg-gray-900/30 flex items-center justify-center opacity-50">
+                                                            <span className="text-gray-700 font-bold text-lg">{num}</span>
+                                                        </div>
+                                                    )
+                                                }
+
+                                                return (
+                                                    <button
+                                                        key={id}
+                                                        onClick={() => toggleLesson(id)}
+                                                        className={`group relative aspect-square rounded-lg border text-xs font-bold transition-all flex flex-col items-center justify-center ${isSelected 
+                                                            ? 'bg-cyan-900/60 border-cyan-400 text-white shadow-[0_0_5px_rgba(0,255,255,0.2)]' 
+                                                            : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-500 hover:bg-gray-800'}`}
+                                                    >
+                                                        <span className={`text-2xl md:text-3xl font-black mb-1 ${isSelected ? 'text-cyan-400' : 'text-gray-500'}`}>{num}</span>
+                                                        {isSelected && <div className="absolute top-1 right-1 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_5px_cyan]"></div>}
+                                                        <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-[10px] text-gray-300 py-1 px-1 text-center opacity-0 group-hover:opacity-100 transition-opacity truncate rounded-b-lg">
+                                                            {previewText}...
+                                                        </div>
+                                                    </button>
+                                                );
+                                        })}
+                                    </div>
+                                </>
+                            )}
                              <div className="mt-2 text-right text-xs text-gray-500">
                                 已選擇 {selectedLessonIds.length} 個題庫
                             </div>
@@ -731,7 +826,7 @@ export const HUD: React.FC = () => {
       );
   }
 
-  // ... (GAME_OVER, VICTORY, and main HUD return logic remain unchanged)
+  // ... (rest of HUD content unchanged)
   if (status === GameStatus.GAME_OVER) {
        return (
           <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-sm overflow-y-auto custom-scrollbar">
@@ -853,7 +948,9 @@ export const HUD: React.FC = () => {
                 答題進度: {totalCorrectAnswers} / {victoryTarget === 0 ? '∞' : victoryTarget}
              </div>
              <div className="text-[10px] text-gray-400 mt-1">
-                 {selectedLessonIds.length > 1 ? `多重題庫 (${selectedLessonIds.length})` : selectedLessonIds.length === 1 ? LESSON_NAMES[selectedLessonIds[0]?.split('_')[0]] + ' ' + selectedLessonIds[0]?.split('_')[2] + '課' : '未選擇題庫'}
+                 {selectedLessonIds.length > 1 ? `多重題庫 (${selectedLessonIds.length})` : selectedLessonIds.length === 1 ? 
+                    (selectedLessonIds[0] === 'CUSTOM' ? '自訂題庫' : LESSON_NAMES[selectedLessonIds[0]?.split('_')[0]] + ' ' + selectedLessonIds[0]?.split('_')[2] + '課') 
+                    : '未選擇題庫'}
              </div>
         </div>
 
