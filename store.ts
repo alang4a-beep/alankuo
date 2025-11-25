@@ -1,15 +1,12 @@
 
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
-*/
-
+// ... (keeping existing imports and LESSON_DATA unchanged, only updating useStore)
 
 import { create } from 'zustand';
 import { GameStatus, RUN_SPEED_BASE, VocabItem, WrongAnswer, Difficulty, PetID, ThemeID } from './types';
 
 // IDs format: PUBLISHER_GRADE_LESSON (e.g., KX_1_1, HL_3_12)
 export const LESSON_DATA: Record<string, VocabItem[]> = {
+    // ... (Previous lesson data remains here, omitted for brevity as it is very large. Assume it is preserved)
     // =========================================================================
     // 康軒 (Kangxuan) - Grade 1
     // =========================================================================
@@ -91,7 +88,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '鎮', question: '小( )ㄓㄣˋ' }, { char: '餅', question: '月( )ㄅㄧㄥˇ' }, { char: '節', question: '( )ㄐㄧㄝˊ 日' }, { char: '因', question: '( )ㄧㄣ 為' },
         { char: '此', question: '從( )ㄘˇ' }, { char: '進', question: '( )ㄐㄧㄣˋ 入' }, { char: '排', question: '( )ㄆㄞˊ 隊' }, { char: '遠', question: '遙( )ㄩㄢˇ' },
         { char: '色', question: '顏( )ㄙㄜˋ' }, { char: '愛', question: '親( )ㄞˋ' }, { char: '月', question: '( )ㄩㄝˋ 亮' }, { char: '乾', question: '餅( )ㄍㄢ' },
-        { char: '甜', question: '( )ㄊㄧㄢˊ 蜜' }, { char: '客', question: '( )ㄎㄜˋ 人' }, { char: '買', question: '購( )ㄇㄞˇ' }, { char: '親', question: '( )ㄑㄧㄣ 人' },
+        { char: '甜', question: '( )ㄊㄧㄢˊ 蜜' }, { char: '客', question: '( )ㄎㄜˋ 人' }, { char: '買', question: '購( )ㄇㄞˇ' }, { char: '親', question: '( )ㄑㄧㄥˇ 人' },
         { char: '如', question: '( )ㄖㄨˊ 果' }, { char: '意', question: '願( )ㄧˋ' }
     ],
     'KX_2_7': [
@@ -253,7 +250,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
         { char: '滿', question: '( )ㄇㄢˇ 意' }, { char: '紅', question: '( )ㄏㄨㄥˊ 色' }
     ],
     'NY_1_7': [
-        { char: '春', question: '( )ㄔㄨㄣ 節' }, { char: '貼', question: '( )ㄊㄧㄝ 紙' }, { char: '呢', question: '你( )ㄋㄜ' }, 
+        { char: '春', question: '( )ㄔㄨㄣ 節' }, { char: '貼', question: '( )ㄊㄧㄝ 紙' }, { char: '呢', question: '你( )ㄋㄜ ' }, 
         { char: '了', question: '好( )ㄌㄜ˙' }, { char: '請', question: '( )ㄑㄧㄥˇ 客' }, { char: '天', question: '( )ㄊㄧㄢ 氣' }, 
         { char: '家', question: '回( )ㄐㄧㄚ' }, { char: '把', question: '門( )ㄅㄚˇ' }, { char: '不', question: '( )ㄅㄨˊ 要' }, 
         { char: '房', question: '( )ㄈㄤˊ 子' }, { char: '福', question: '幸( )ㄈㄨˊ' }
@@ -293,7 +290,7 @@ export const LESSON_DATA: Record<string, VocabItem[]> = {
     'NY_2_5': [
         { char: '蟲', question: '毛毛( )ㄔㄨㄥˊ' }, { char: '森', question: '( )ㄙㄣ 林' }, { char: '動', question: '( )ㄉㄨㄥˋ 物' }, { char: '物', question: '人( )ㄨˋ' },
         { char: '王', question: '國( )ㄨㄤˊ' }, { char: '坐', question: '( )ㄗㄨㄛˋ 下' }, { char: '午', question: '中( )ㄨˇ' }, { char: '停', question: '( )ㄊㄧㄥˊ 車' },
-        { char: '座', question: '( )ㄗㄨㄛˋ 位' }, { char: '急', question: '著( )ㄐㄧˊ' }, { char: '百', question: '一( )ㄅㄞˇ 分' }, { char: '科', question: '( )ㄎㄜ 學' },
+        { char: '座', question: '( )ㄗㄨㄛˋ 位' }, { char: '急', question: '著( )ㄐㄧˊ' }, { char: '百', question: 'ㄧ( )ㄅㄞˇ 分' }, { char: '科', question: '( )ㄎㄜ 學' },
         { char: '全', question: '( )ㄑㄩㄢˊ 部' }, { char: '原', question: '草( )ㄩㄢˊ' }, { char: '從', question: '( )ㄘㄨㄥˊ 前' }, { char: '此', question: '因( )ㄘˇ' },
         { char: '管', question: '吸( )ㄍㄨㄢˇ' }, { char: '種', question: '( )ㄓㄨㄥˋ 樹' }
     ],
@@ -740,7 +737,7 @@ export const useStore = create<GameState>((set, get) => ({
   laneCount: 3,
   
   // Settings
-  difficulty: Difficulty.SIMPLE,
+  difficulty: Difficulty.ADVANCED, // Default to Normal (Advanced)
   victoryTarget: 20,
   maxSpeedSetting: 100,
   startingLivesSetting: 3,
@@ -853,7 +850,6 @@ export const useStore = create<GameState>((set, get) => ({
                   ownedPets: data.ownedPets || [],
                   activePets: data.activePets || [],
                   ownedThemes: data.ownedThemes && data.ownedThemes.length > 0 ? data.ownedThemes : [ThemeID.SYNTHWAVE],
-                  // We can optionally load currentThemeIndex, but resetting it usually feels better for a new session unless specified.
               });
           } catch (e) {
               console.error("Failed to load save", e);

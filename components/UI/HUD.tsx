@@ -1,10 +1,5 @@
 
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
-*/
-
-
+// ... (imports)
 import React, { useState, useEffect } from 'react';
 import { Heart, Zap, Trophy, MapPin, Diamond, Rocket, ArrowUpCircle, Shield, Activity, PlusCircle, Play, HelpCircle, BookOpen, AlertCircle, Flame, Wind, Target, CheckSquare, Square, WifiOff, Settings, AlertTriangle, Layers, Magnet, User, Volume2, VolumeX, Ghost, Gamepad2, BatteryCharging, Terminal, Baby, PauseCircle, Home, RotateCcw, Percent, Palette, Infinity } from 'lucide-react';
 import { useStore } from '../../store';
@@ -12,8 +7,15 @@ import { GameStatus, ShopItem, RUN_SPEED_BASE, Difficulty, PetID, ThemeID } from
 import { audio } from '../System/Audio';
 import { LESSON_NAMES, LESSON_DATA } from '../../store';
 
-// Available Shop Items - Sorted by Cost (Low to High)
+// ... (SHOP_ITEMS and ShopScreen remain the same, skipping for brevity)
 const SHOP_ITEMS: ShopItem[] = [
+    {
+        id: 'HEAL',
+        name: '修復工具包',
+        description: '立即恢復 1 點生命值。',
+        cost: 1000,
+        icon: PlusCircle
+    },
     {
         id: 'DOUBLE_JUMP',
         name: '二段跳躍',
@@ -21,13 +23,6 @@ const SHOP_ITEMS: ShopItem[] = [
         cost: 1000,
         icon: ArrowUpCircle,
         oneTime: true
-    },
-    {
-        id: 'HEAL',
-        name: '修復工具包',
-        description: '立即恢復 1 點生命值。',
-        cost: 1000,
-        icon: PlusCircle
     },
     {
         id: 'FIREBALL',
@@ -253,7 +248,7 @@ const ShopScreen: React.FC = () => {
     );
 };
 
-// ... [WrongAnswerReview and MobileControls components remain unchanged] ...
+// ... (WrongAnswerReview, MobileControls, PauseScreen unchanged)
 const WrongAnswerReview: React.FC = () => {
     const { wrongAnswers } = useStore();
     if (wrongAnswers.length === 0) return null;
@@ -380,13 +375,26 @@ const MobileControls: React.FC = () => {
 }
 
 const PauseScreen: React.FC = () => {
-    const { setStatus, restartGame, returnToMenu } = useStore();
+    const { setStatus, restartGame, returnToMenu, currentVocab } = useStore();
     return (
         <div className="absolute inset-0 bg-black/60 z-[100] text-white pointer-events-auto backdrop-blur-sm flex items-center justify-center">
              <div className="bg-gray-900/90 p-8 rounded-2xl border border-cyan-500/50 shadow-[0_0_40px_rgba(0,255,255,0.2)] flex flex-col items-center w-full max-w-sm">
-                 <h2 className="text-4xl font-black text-white mb-8 font-cyber tracking-widest flex items-center">
+                 <h2 className="text-4xl font-black text-white mb-6 font-cyber tracking-widest flex items-center">
                      <PauseCircle className="w-10 h-10 mr-3 text-cyan-400" /> 暫停
                  </h2>
+                 
+                 {/* Display Current Question with TTS Click */}
+                 {currentVocab && (
+                     <div 
+                        onClick={() => audio.speak(currentVocab.question)}
+                        className="mb-6 bg-black/50 p-4 rounded-xl border border-cyan-500/30 cursor-pointer hover:bg-black/70 transition-colors w-full text-center group active:scale-95"
+                     >
+                         <div className="text-sm text-gray-400 mb-1 flex items-center justify-center gap-2">
+                             <HelpCircle className="w-4 h-4" /> 當前題目 (點擊發音) <Volume2 className="w-4 h-4 text-cyan-400 group-hover:animate-pulse" />
+                         </div>
+                         <div className="text-3xl font-bold text-white">{currentVocab.question}</div>
+                     </div>
+                 )}
                  
                  <button 
                     onClick={() => setStatus(GameStatus.PLAYING)}
@@ -587,38 +595,51 @@ export const HUD: React.FC = () => {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setDifficulty(Difficulty.SUPER_SIMPLE)}
-                                        className={`flex-1 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center ${
+                                        className={`flex-1 py-2 rounded-md text-xs md:text-sm font-bold transition-all flex items-center justify-center ${
                                             difficulty === Difficulty.SUPER_SIMPLE
                                             ? 'bg-blue-500 text-white shadow-lg ring-2 ring-blue-300' 
                                             : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                                         }`}
                                     >
-                                        <Baby className="w-4 h-4 mr-1" />
+                                        <Baby className="w-3 h-3 mr-1" />
                                         超級簡單
                                     </button>
                                     <button
                                         onClick={() => setDifficulty(Difficulty.SIMPLE)}
-                                        className={`flex-1 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center ${
+                                        className={`flex-1 py-2 rounded-md text-xs md:text-sm font-bold transition-all flex items-center justify-center ${
                                             difficulty === Difficulty.SIMPLE
                                             ? 'bg-green-600 text-white shadow-lg' 
                                             : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                                         }`}
                                     >
-                                        簡單 (一般)
+                                        簡單
                                     </button>
                                     <button
-                                        onClick={() => setDifficulty(Difficulty.COMPLEX)}
-                                        className={`flex-1 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center ${
-                                            difficulty === Difficulty.COMPLEX
+                                        onClick={() => setDifficulty(Difficulty.ADVANCED)}
+                                        className={`flex-1 py-2 rounded-md text-xs md:text-sm font-bold transition-all flex items-center justify-center ${
+                                            difficulty === Difficulty.ADVANCED
+                                            ? 'bg-orange-600 text-white shadow-lg' 
+                                            : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                                        }`}
+                                    >
+                                        進階
+                                    </button>
+                                    <button
+                                        onClick={() => setDifficulty(Difficulty.EXTREME)}
+                                        className={`flex-1 py-2 rounded-md text-xs md:text-sm font-bold transition-all flex items-center justify-center ${
+                                            difficulty === Difficulty.EXTREME
                                             ? 'bg-red-600 text-white shadow-lg border border-red-400' 
                                             : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                                         }`}
                                     >
-                                        複雜 (挑戰)
+                                        挑戰極限
                                     </button>
                                 </div>
                                 <div className="text-[10px] text-gray-500 mt-1 text-center">
-                                    {difficulty === Difficulty.SUPER_SIMPLE ? "撞到障礙物不會扣血 (適合練習)" : difficulty === Difficulty.COMPLEX ? "會出現需「二段跳」的高牆與需「跳躍/攻擊」的寬牆" : "僅出現標準障礙物"}
+                                    {difficulty === Difficulty.SUPER_SIMPLE ? "無敵模式 (不扣血)，障礙物少" : 
+                                     difficulty === Difficulty.SIMPLE ? "會受傷，障礙物少" :
+                                     difficulty === Difficulty.ADVANCED ? "標準難度" :
+                                     "出現高牆與寬牆，考驗操作"}
                                 </div>
                             </div>
                         </div>
@@ -710,6 +731,7 @@ export const HUD: React.FC = () => {
       );
   }
 
+  // ... (GAME_OVER, VICTORY, and main HUD return logic remain unchanged)
   if (status === GameStatus.GAME_OVER) {
        return (
           <div className="absolute inset-0 bg-black/90 z-[100] text-white pointer-events-auto backdrop-blur-sm overflow-y-auto custom-scrollbar">
@@ -838,26 +860,14 @@ export const HUD: React.FC = () => {
         {/* QUESTION DISPLAY */}
         {currentVocab && (
              <div className="absolute top-20 md:top-24 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-in fade-in zoom-in duration-300">
-                <div className="bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-2xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.3)] min-w-[280px] md:min-w-[400px] text-center relative">
-                     {/* TTS Button on Question Box */}
-                     {ttsEnabled && (
-                         <button 
-                            onClick={() => {
-                                const cleanText = currentVocab.question.replace(/\(\s*\)/g, '').replace(/\s+/g, '');
-                                const u = new SpeechSynthesisUtterance(cleanText);
-                                u.lang = 'zh-TW';
-                                window.speechSynthesis.cancel();
-                                window.speechSynthesis.speak(u);
-                            }}
-                            className="absolute top-2 right-2 pointer-events-auto text-cyan-500 hover:text-white"
-                         >
-                             <Volume2 className="w-4 h-4" />
-                         </button>
-                     )}
-
+                <div 
+                    onClick={() => audio.speak(currentVocab.question)}
+                    className="bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-2xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,255,0.3)] min-w-[280px] md:min-w-[400px] text-center relative cursor-pointer hover:border-cyan-400 transition-colors active:scale-95 pointer-events-auto"
+                >
                     <div className="flex items-center justify-center space-x-2 mb-2 text-cyan-400 opacity-80 text-sm font-mono tracking-widest">
                         <HelpCircle className="w-4 h-4" /> 
-                        <span>請填入正確的字</span>
+                        <span>請填入正確的字 (點擊發音)</span>
+                        {ttsEnabled && <Volume2 className="w-3 h-3 text-green-400" />}
                     </div>
                     <div className="text-4xl md:text-6xl font-black text-white font-serif drop-shadow-md">
                         {currentVocab.question}

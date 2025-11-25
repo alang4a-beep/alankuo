@@ -27,9 +27,10 @@ export enum ObjectType {
 }
 
 export enum Difficulty {
-  SUPER_SIMPLE = 'SUPER_SIMPLE', // No damage
-  SIMPLE = 'SIMPLE',
-  COMPLEX = 'COMPLEX'
+  SUPER_SIMPLE = 'SUPER_SIMPLE', // No damage, Low Density
+  SIMPLE = 'SIMPLE',             // Damage, Low Density
+  ADVANCED = 'ADVANCED',         // Damage, Normal Density
+  EXTREME = 'EXTREME'            // Damage, Normal Density + Complex Obstacles
 }
 
 export enum PetID {

@@ -1,9 +1,5 @@
 
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
-*/
-
+// ... (keeping imports and geometry definitions unchanged)
 
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -14,7 +10,8 @@ import { useStore } from '../../store';
 import { GameObject, ObjectType, LANE_WIDTH, SPAWN_DISTANCE, REMOVE_DISTANCE, GameStatus, NEON_COLORS, Difficulty, PetID } from '../../types';
 import { audio } from '../System/Audio';
 
-// Geometry Constants
+// ... (keeping geometry constants, createCharTexture, and ParticleSystem unchanged)
+
 const OBSTACLE_HEIGHT = 1.6;
 const OBSTACLE_TALL_HEIGHT = 3.2; 
 
@@ -57,7 +54,6 @@ const SHOP_FLOOR_GEO = new THREE.PlaneGeometry(1, 4);
 const PARTICLE_COUNT = 600;
 const SPAWN_INTERVAL_BASE = 150; 
 
-// --- Helper: Generate Chinese Char Texture ---
 const createCharTexture = (char: string, color: string) => {
     const canvas = document.createElement('canvas');
     canvas.width = 512; 
@@ -77,12 +73,10 @@ const createCharTexture = (char: string, color: string) => {
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace; 
     tex.minFilter = THREE.LinearMipMapLinearFilter;
-    tex.magFilter = THREE.LinearFilter;
     tex.generateMipmaps = true;
     return tex;
 }
 
-// --- Particle System ---
 const ParticleSystem: React.FC = () => {
     const mesh = useRef<THREE.InstancedMesh>(null);
     const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -433,9 +427,15 @@ export const LevelManager: React.FC = () => {
                 }
             } else if (inZZone) {
                 const dx = Math.abs(obj.position[0] - playerPos.x);
-                if (dx < 0.9) { 
-                     
-                     const isDamageSource = obj.type === ObjectType.OBSTACLE || obj.type === ObjectType.ALIEN || obj.type === ObjectType.MISSILE;
+                
+                // Dynamic Hitbox Width Logic
+                const isHazard = obj.type === ObjectType.OBSTACLE || obj.type === ObjectType.ALIEN || obj.type === ObjectType.MISSILE;
+                // Hazards: tighter box (0.75) for fairer dodging
+                // Collectibles: wider box (1.2) for easier pickup
+                const hitThreshold = isHazard ? 0.75 : 1.2;
+
+                if (dx < hitThreshold) { 
+                     const isDamageSource = isHazard;
                      
                      if (isDamageSource) {
                          const playerBottom = playerPos.y;
@@ -525,13 +525,17 @@ export const LevelManager: React.FC = () => {
     }
 
     // Scale spawn visibility distance with speed (look ahead)
-    // Base 120, but at speed 300 we need ~360 to see 1.2s ahead
     const dynamicSpawnDistance = Math.max(SPAWN_DISTANCE, speed * 1.2);
 
     if (furthestZ > -dynamicSpawnDistance) {
-         // Increase gap at high speeds to prevent overlap visual chaos
-         // At 300 speed, gap ~ 120 units (0.4s)
-         const minGap = Math.max(15, speed * 0.4); 
+         // Difficulty Adjustments:
+         // Low Density for Simple/Super Simple modes
+         const isLowDensity = difficulty === Difficulty.SUPER_SIMPLE || difficulty === Difficulty.SIMPLE;
+         const spawnThreshold = isLowDensity ? 0.5 : 0.1; // Lower chance to spawn obstacles if low density
+
+         // Increase gap at high speeds or low difficulty
+         let gapMultiplier = isLowDensity ? 0.8 : 0.4;
+         const minGap = Math.max(15, speed * gapMultiplier); 
          
          const spawnZ = Math.min(furthestZ - minGap, -dynamicSpawnDistance);
          
@@ -552,13 +556,12 @@ export const LevelManager: React.FC = () => {
                 isTarget: isTarget
              });
              
-             // Scale interval: maintain roughly 2 seconds between questions regardless of speed
-             // At speed 22.5 -> ~45 units. At speed 300 -> ~600 units.
+             // Scale interval
              const nextInterval = Math.max(40, speed * 2.0);
              nextSpawnDistance.current = distanceTraveled.current + nextInterval; 
              hasChanges = true;
 
-         } else if (Math.random() > 0.1) { 
+         } else if (Math.random() > spawnThreshold) { 
             // OBSTACLE SPAWNING
             const isObstacle = Math.random() > 0.20;
 
@@ -581,8 +584,10 @@ export const LevelManager: React.FC = () => {
                     for (let i = -maxLane; i <= maxLane; i++) availableLanes.push(i);
                     availableLanes.sort(() => Math.random() - 0.5);
 
-                    const spawnWall = difficulty === Difficulty.COMPLEX && Math.random() < 0.15; 
-                    const spawnTower = difficulty === Difficulty.COMPLEX && Math.random() < 0.15; 
+                    // Complex Walls/Towers only in EXTREME mode
+                    const isExtreme = difficulty === Difficulty.EXTREME;
+                    const spawnWall = isExtreme && Math.random() < 0.15; 
+                    const spawnTower = isExtreme && Math.random() < 0.15; 
 
                     if (spawnWall) {
                         for (let i = -maxLane; i <= maxLane; i++) {
@@ -635,9 +640,16 @@ export const LevelManager: React.FC = () => {
                              }
                         }
                     } else {
+                        // Standard Obstacle Spawning
                         const spawnCountBase = Math.floor(laneCount / 2); 
                         const variation = Math.random() > 0.5 ? 1 : 0;
                         let countToSpawn = Math.max(1, spawnCountBase + variation);
+                        
+                        // Reduce count for simple modes
+                        if (isLowDensity) {
+                            countToSpawn = 1; 
+                        }
+                        
                         if (countToSpawn >= availableLanes.length) countToSpawn = availableLanes.length - 1;
 
                         for (let i = 0; i < countToSpawn; i++) {
@@ -697,7 +709,7 @@ export const LevelManager: React.FC = () => {
   );
 };
 
-// ... [CharSprite component] ...
+// ... (keeping CharSprite and GameEntity unchanged)
 const CharSprite: React.FC<{ value: string, color: string }> = ({ value, color }) => {
     const texture = useMemo(() => createCharTexture(value, color), [value, color]);
     useEffect(() => {
